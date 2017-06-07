@@ -1,0 +1,25 @@
+{
+  "name": "graphql-sso-example",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/zushenyan/graphql-sso-example.git",
+  "author": "Andrew Yan <zushenyan@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "body-parser": "^1.17.2",
+    "express": "^4.15.3",
+    "express-graphql": "^0.6.6",
+    "express-jwt": "^5.3.0",
+    "graphql": "^0.10.1",
+    "jsonwebtoken": "^7.4.1",
+    "lodash": "^4.17.4",
+    "morgan": "^1.8.2",
+    "ramda": "^0.24.1"
+  },
+  "devDependencies": {
+    "nodemon": "^1.11.0"
+  },
+  "scripts": {
+    "nodemon": "nodemon"
+  }
+}
