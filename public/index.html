@@ -2,16 +2,58 @@
 <html>
   <head>
     <title>test</title>
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
   </head>
   <body>
+    <h1>hello</h1>
+
+    <button id="logout">logout</button>
+
     <script>
       window.fbAsyncInit = function() {
         FB.init({
           appId      : '131009120793785',
+          cookie: true,
           xfbml      : true,
           version    : 'v2.9'
         });
         FB.AppEvents.logPageView();
+        // FB.api("/me", (res) => {
+        //   console.log(res);
+        // });
+        // FB.logout((res) => {
+        //   console.log(res);
+        // });
+        // FB.login((res) => {
+        //   console.log("dsaasd");
+        //   console.log(res);
+        // }, { scope: "email", return_scopes: true });
+        FB.getLoginStatus((res) => {
+          console.log(res);
+          if(res.status === "unknown"){
+            FB.login((res2) => {
+              console.log(res2);
+              // FB.api("/me", (res3) => {
+              //   console.log(res3);
+              // });
+              // FB.api("/me/permissions", (res3) => {
+              //   console.log(res3);
+              // });
+              FB.api(`/me`, {
+                fields: "id, first_name, last_name, gender, email, cover"
+              }, (res3) => {
+                console.log(res3);
+              });
+              // FB.api(`/${res2.authResponse.userID}`, (res3) => {
+              //   console.log(res3);
+              // });
+            }, {
+              // scope: "email"                             // "EAAB3JvAbdLkBACn9UZBNZBBF8S82Uc5dGOyXZAg8nu1fynW6z0BkT8cTrEpc63Ob4bgwxa2zdp1l6DES2wY9VmigIZA7gXkRzYZA8Q4iEPk3In3rDt5zliiHOqNSBdlT6jV2hpMDHWZBUnHlp6Q0SnA8AXiVSoYRoS8izR9Du9iTYWz4Uo6DjG"
+              // scope: "email,public_profile"                 // "EAAB3JvAbdLkBAGJR0G9trZCoruywR5grd0cP3CrcWSNt1btX4ZB5YOTZB3cwTpdZCMWsegpskWy2bSPt8g9frS83jD54SZAwXcVa7QCdL3vscGNVrp12Bo0bFZCaYhotgrfa8o9Qvf6kWi5ysEkdhr6oBs7KeZBhUleuZCNXZBoLZCHbdpbawA7snx"
+              scope: "email,public_profile,user_friends" // "EAAB3JvAbdLkBAOVHBZAmC5fLRH9waZBEB3LntTU7sAvBe4o1x0e9YNJQFZCa4gPUM7mkeUTsfSZBrAvUPSJH4G7w4p8eCCDyjqe3KMNEnZCCWt3XgZBCWmaGLfVyrMAt93n8TpiA4RLA15r5kryQ44Tuq15ep6qpaJXJgXpEwO51xmAnlHR4ZAY"
+            });
+          }
+        });
       };
 
       (function(d, s, id){
@@ -22,14 +64,14 @@
          fjs.parentNode.insertBefore(js, fjs);
        }(document, 'script', 'facebook-jssdk'));
     </script>
-
-    <h1>hello</h1>
-
-    <div
-      class="fb-like"
-      data-share="true"
-      data-width="450"
-      data-show-faces="true">
-    </div>
+    <script>
+      $(() => {
+        $("#logout").on("click", () => {
+          FB.logout((res) => {
+            console.log(res);
+          });
+        });
+      })
+    </script>
   </body>
 </html>
