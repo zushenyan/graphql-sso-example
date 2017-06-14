@@ -9,6 +9,18 @@ const {
 } = require("./types.js");
 const models = require("../models/user.js");
 
+const signUpFacebook = {
+  name:        "signUpFacebook",
+  description: "sign up facebook!",
+  args:        {
+    email:       { type: new GraphQLNonNull(GraphQLString) },
+    userId:      { type: new GraphQLNonNull(GraphQLString) },
+    accessToken: { type: new GraphQLNonNull(GraphQLString) }
+  },
+  type:    UserType,
+  resolve: (root, args, context) => models.signUpFacebook(args, context)
+};
+
 const signUp = {
   name:        "signUp",
   description: "sign up!",
@@ -17,7 +29,7 @@ const signUp = {
     password:        { type: new GraphQLNonNull(GraphQLString) },
     confirmPassword: { type: new GraphQLNonNull(GraphQLString) }
   },
-  type: UserType,
+  type:    UserType,
   resolve: (root, args, context) => models.signUp(args, context)
 };
 
@@ -28,8 +40,15 @@ const signIn = {
     email:    { type: new GraphQLNonNull(GraphQLString) },
     password: { type: new GraphQLNonNull(GraphQLString) }
   },
-  type: UserType,
+  type:    UserType,
   resolve: (root, args, context) => models.signIn(args, context)
+};
+
+const signOut = {
+  name:        "signOut",
+  description: "sign out!",
+  type:        GraphQLString,
+  resolve:     (root, args, context) => models.signOut(context)
 };
 
 const setMessage = {
@@ -45,8 +64,10 @@ const setMessage = {
 module.exports = new GraphQLObjectType({
   name: "Mutation",
   fields: () => ({
+    signUpFacebook,
     signUp,
     signIn,
+    signOut,
     setMessage
   })
 });
