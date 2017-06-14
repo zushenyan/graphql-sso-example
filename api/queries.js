@@ -10,26 +10,23 @@ const {
 const models = require("../models/user.js");
 
 const getUsers = {
-  name: "getUsers",
+  name:        "getUsers",
   description: "get users!",
-  type: new GraphQLList(UserType),
-  resolve: (root, args) => models.getUsers(args)
+  type:        new GraphQLList(UserType),
+  resolve:     (root, args) => models.getUsers(args)
 };
 
-const getUserInfo = {
-  name:        "getUserInfo",
-  description: "get user info!",
-  args:        {
-    id: { type: new GraphQLNonNull(GraphQLID) }
-  },
-  type:    UserType,
-  resolve: (root, args) => models.getUserInfo(args)
+const getCurrentUser = {
+  name:        "getCurrentUser",
+  description: "get current user!",
+  type:        UserType,
+  resolve:     (root, args, context) => models.getCurrentUser(context)
 };
 
 module.exports = new GraphQLObjectType({
   name: "Query",
   fields: () => ({
     getUsers,
-    getUserInfo
+    getCurrentUser
   })
 });
