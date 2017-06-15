@@ -9,18 +9,6 @@ const {
 } = require("./types.js");
 const models = require("../models/user.js");
 
-const signUpFacebook = {
-  name:        "signUpFacebook",
-  description: "sign up facebook!",
-  args:        {
-    email:       { type: new GraphQLNonNull(GraphQLString) },
-    userId:      { type: new GraphQLNonNull(GraphQLString) },
-    accessToken: { type: new GraphQLNonNull(GraphQLString) }
-  },
-  type:    UserType,
-  resolve: (root, args, context) => models.signUpFacebook(args, context)
-};
-
 const signUp = {
   name:        "signUp",
   description: "sign up!",
@@ -44,6 +32,18 @@ const signIn = {
   resolve: (root, args, context) => models.signIn(args, context)
 };
 
+const signInWithFacebook = {
+  name:        "signInWithFacebook",
+  description: "sign up facebook!",
+  args:        {
+    userId:      { type: new GraphQLNonNull(GraphQLString) },
+    accessToken: { type: new GraphQLNonNull(GraphQLString) }
+  },
+  type:    UserType,
+  resolve: (root, args, context) => models.signInWithFacebook(args, context)
+};
+
+
 const signOut = {
   name:        "signOut",
   description: "sign out!",
@@ -64,9 +64,9 @@ const setMessage = {
 module.exports = new GraphQLObjectType({
   name: "Mutation",
   fields: () => ({
-    signUpFacebook,
     signUp,
     signIn,
+    signInWithFacebook,
     signOut,
     setMessage
   })
