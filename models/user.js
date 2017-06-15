@@ -13,7 +13,7 @@ const getUserById    = (id) => _.find(users, (user) => user.id === id);
 const getUserByEmail = (email) => _.find(users, (user) => user.email === email);
 const getUserByAuth  = (email, password) => _.find(users, (user) => user.email === email && user.password === password);
 
-const createUser = (email, password, confirmPassword, message = "this is a default message") => {
+const createUser = ({email, password, confirmPassword, message = "this is a default message", signInWithFacebook = false}) => {
   if(email.length === 0) throw new Error(`email can't be empty`);
   if(getUserByEmail(email)) throw new Error(`email [${email}] has already been taken`);
   if(password !== confirmPassword) throw new Error(`passwords don't match`);
@@ -22,7 +22,8 @@ const createUser = (email, password, confirmPassword, message = "this is a defau
     id: generateID(),
     email,
     password,
-    message
+    message,
+    signInWithFacebook
   };
   return user;
 };
@@ -35,9 +36,10 @@ const getCurrentUser = ({ req, res }) => {
     const user        = getUserById(id);
     if(user) {
       return {
-        id:      user.id,
-        email:   user.email,
-        message: user.message
+        id:                 user.id,
+        email:              user.email,
+        message:            user.message,
+        signInWithFacebook: user.signInWithFacebook
       };
     }
     throw new Error(`user [${id}] not found`);
@@ -49,7 +51,7 @@ const getCurrentUser = ({ req, res }) => {
 
 const signUp = ({ email, password, confirmPassword }, { req, res }) => {
   try {
-    const user = createUser(email, password, confirmPassword);
+    const user = createUser({email, password, confirmPassword});
     users.push(user);
     const token = createJwt(user.id);
     res.cookie("token", token);
@@ -60,7 +62,7 @@ const signUp = ({ email, password, confirmPassword }, { req, res }) => {
   }
 };
 
-const signUpFacebook = async ({ email, userId, accessToken }, { req, res }) => {
+const signInWithFacebook = async ({ userId, accessToken }, { req, res }) => {
   try {
     const { data } = await axios({
       url: `https://graph.facebook.com/v2.9/${userId}`,
@@ -74,11 +76,19 @@ const signUpFacebook = async ({ email, userId, accessToken }, { req, res }) => {
         fields:       "id,email"
       }
     });
-    const { email: facebookEmail } = data;
-    if(facebookEmail !== email) throw new Error("email is not the same");
-    const user = createUser(email, "temptemp", "temptemp");
-    users.push(user);
-    return user;
+    const { email } = data;
+    const user = getUserByEmail(email);
+    if(user) {
+      const token = createJwt(user.id);
+      res.cookie("token", token);
+      return Object.assign({}, user, { token });
+    }
+    const password = "whatever";
+    const newUser  = createUser({ email, password, confirmPassword: password, signInWithFacebook: true });
+    users.push(newUser);
+    const token = createJwt(newUser.id);
+    res.cookie("token", token);
+    return Object.assign({}, newUser, { token });
   }
   catch(err){
     if(err.response) throw err.response.data.error.message;
@@ -89,6 +99,7 @@ const signUpFacebook = async ({ email, userId, accessToken }, { req, res }) => {
 const signIn = ({ email, password }, { req, res }) => {
   const user = getUserByAuth(email, password);
   if(user) {
+    if(user.signInWithFacebook) throw new Error("Use your facebook account to sign in!");
     const token = createJwt(user.id);
     res.cookie("token", token);
     return Object.assign({}, user, { token });
@@ -101,7 +112,7 @@ const signOut = ({ req, res }) => {
   return "sign out successfuly";
 };
 
-const setMessage = ({message}, { req, res }) => {
+const setMessage = ({ message }, { req, res }) => {
   try {
     const { sub: id } = verifyJwt(getToken(req));
     const user        = getUserById(id);
@@ -114,13 +125,13 @@ const setMessage = ({message}, { req, res }) => {
 };
 
 // prepare users data
-users.push(createUser("foobar@test.com", "1234", "1234"));
-users.push(createUser("ggyy@test.com", "4321", "4321"));
+users.push(createUser({ email: "foobar@test.com", password: "1234", confirmPassword: "1234" }));
+users.push(createUser({ email: "ggyy@test.com", password: "4321", confirmPassword: "4321"}));
 
 module.exports = {
   getUsers,
   getCurrentUser,
-  signUpFacebook,
+  signInWithFacebook,
   signUp,
   signIn,
   signOut,

@@ -31,6 +31,8 @@
       <input type="password" name="password" v-model="signInPassword" />
       <br>
       <button v-on:click="signIn">sign in</button>
+      <br>
+      <button v-on:click="signInWithFacebook">sign in with facebook</button>
     </div>
     <div>
       <h1>Sign Out</h1>
@@ -64,18 +66,23 @@ const fetchQL = (query, variables) => {
 };
 
 let data = {
-  email: "guest",
-  signInEmail: "foobar@test.com",
-  signInPassword: "1234",
-  signUpEmail: "meow@test.com",
-  signUpPassword: "1111",
+  email:                 "guest",
+  signInEmail:           "foobar@test.com",
+  signInPassword:        "1234",
+  signUpEmail:           "meow@test.com",
+  signUpPassword:        "1111",
   signUpConfirmPassword: "1111",
-  message: "foobar lala",
-  result: ""
+  message:               "foobar lala",
+  result:                ""
 };
 
 export default {
   name: 'app',
+  created(){
+    document.addEventListener("fbInit", () => {
+      console.log(`Facebook SDK is now available`);
+    });
+  },
   data() { return data; },
   methods: {
     getUsers(){
@@ -86,6 +93,7 @@ export default {
             email
             message
             token
+            signInWithFacebook
           }
         }
       `;
@@ -105,6 +113,7 @@ export default {
             email
             message
             token
+            signInWithFacebook
           }
         }
       `;
@@ -116,6 +125,35 @@ export default {
           this.result = err;
         })
     },
+    signInWithFacebook(){
+      FB.login((res) => {
+        const {
+          authResponse: {
+            userID: userId,
+            accessToken
+          }
+        } = res;
+        const query = `
+          mutation kkk($userId: String!, $accessToken: String!){
+            signInWithFacebook(userId: $userId, accessToken: $accessToken){
+              id
+              email
+              message
+              token
+              signInWithFacebook
+            }
+          }
+        `;
+        fetchQL(query, { userId, accessToken })
+          .then((data) => {
+            this.email  = data.data.signInWithFacebook.email;
+            this.result = data;
+          })
+          .catch((err) => {
+            this.result = err;
+          })
+      });
+    },
     signUp(){
       const query = `
         mutation qqq($email: String!, $password: String!, $confirmPassword: String!){
@@ -124,6 +162,7 @@ export default {
             email
             message
             token
+            signInWithFacebook
           }
         }
       `;
@@ -145,10 +184,12 @@ export default {
             email
             message
             token
+            signInWithFacebook
           }
         }
       `;
-      fetchQL(query, { email: "foobar@test.com", password: "1234" })
+      const { signInEmail: email, signInPassword: password } = this;
+      fetchQL(query, { email, password })
         .then((data) => {
           this.email = data.data.signIn.email;
           this.result = data;
@@ -180,6 +221,7 @@ export default {
             email
             message
             token
+            signInWithFacebook
           }
         }
       `;
