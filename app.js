@@ -9,9 +9,11 @@ const PORT = 8888;
 
 const sitePage =
   express()
-    .use(express.static(path.resolve(__dirname, "./public")))
-    .get("/", (req, res) => {
-      res.sendFile("index.html");
+    .get("/facebook", (req, res) => {
+      res.sendFile(path.resolve(__dirname, "./public/facebook.html"));
+    })
+    .get("/google", (req, res) => {
+      res.sendFile(path.resolve(__dirname, "./public/google.html"));
     });
 
 const graphqlAPI =
