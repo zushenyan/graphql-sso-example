@@ -13,6 +13,7 @@
     <script>
       function onSignIn(user){
         console.log(user);
+        console.log(user.getAuthResponse());
         const profile = user.getBasicProfile();
         console.log(profile);
         console.log(`ID: ${profile.getId()}`);

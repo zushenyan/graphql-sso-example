@@ -34,7 +34,7 @@ const signIn = {
 
 const signInWithFacebook = {
   name:        "signInWithFacebook",
-  description: "sign up facebook!",
+  description: "sign in facebook!",
   args:        {
     userId:      { type: new GraphQLNonNull(GraphQLString) },
     accessToken: { type: new GraphQLNonNull(GraphQLString) }
@@ -43,6 +43,15 @@ const signInWithFacebook = {
   resolve: (root, args, context) => models.signInWithFacebook(args, context)
 };
 
+const signInWithGoogle = {
+  name:        "signInWithGoogle",
+  description: "sign in google!",
+  args:        {
+    token: { type: new GraphQLNonNull(GraphQLString) },
+  },
+  type:    UserType,
+  resolve: (root, args, context) => models.signInWithGoogle(args, context)
+};
 
 const signOut = {
   name:        "signOut",
@@ -61,13 +70,25 @@ const setMessage = {
   resolve: (root, args, context) => models.setMessage(args, context)
 };
 
+const setEmail = {
+  name:        "setEmail",
+  description: "set user email!",
+  args:        {
+    newEmail: { type: new GraphQLNonNull(GraphQLString) }
+  },
+  type:    UserType,
+  resolve: (root, args, context) => models.setEmail(args, context)
+};
+
 module.exports = new GraphQLObjectType({
   name: "Mutation",
   fields: () => ({
     signUp,
     signIn,
     signInWithFacebook,
+    signInWithGoogle,
     signOut,
-    setMessage
+    setMessage,
+    setEmail
   })
 });

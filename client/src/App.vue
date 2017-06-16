@@ -33,6 +33,8 @@
       <button v-on:click="signIn">sign in</button>
       <br>
       <button v-on:click="signInWithFacebook">sign in with facebook</button>
+      <br>
+      <button v-on:click="signInWithGoogle">sign in with google</button>
     </div>
     <div>
       <h1>Sign Out</h1>
@@ -42,9 +44,16 @@
     <div>
       <h1>Set Message</h1>
       <label for="message">message</label>
-      <input type="text" name="" v-model="message">
+      <input type="text" name="message" v-model="message">
       <br>
       <button v-on:click="setMessage">set message</button>
+    </div>
+    <div>
+      <h1>Set Email</h1>
+      <label for="new-email">email</label>
+      <input type="text" name="new-email" v-model="newEmail">
+      <br>
+      <button v-on:click="setEmail">set email</button>
     </div>
   </div>
 </template>
@@ -73,6 +82,7 @@ let data = {
   signUpPassword:        "1111",
   signUpConfirmPassword: "1111",
   message:               "foobar lala",
+  newEmail:              "poop@test.com",
   result:                ""
 };
 
@@ -82,6 +92,9 @@ export default {
     document.addEventListener("fbInit", () => {
       console.log(`Facebook SDK is now available`);
     });
+    document.addEventListener("googleInit", () => {
+      console.log(`Google SDK is now available`);
+    })
   },
   data() { return data; },
   methods: {
@@ -93,7 +106,8 @@ export default {
             email
             message
             token
-            signInWithFacebook
+            facebookId
+            googleId
           }
         }
       `;
@@ -113,7 +127,8 @@ export default {
             email
             message
             token
-            signInWithFacebook
+            facebookId
+            googleId
           }
         }
       `;
@@ -124,6 +139,33 @@ export default {
         .catch((err) => {
           this.result = err;
         })
+    },
+    signInWithGoogle(){
+      gapi.auth2.getAuthInstance()
+        .signIn()
+        .then((user) => {
+          const { id_token: token } = user.getAuthResponse();
+          const query = `
+            mutation jjj($token: String!){
+              signInWithGoogle(token: $token){
+                id
+                email
+                message
+                token
+                facebookId
+                googleId
+              }
+            }
+          `;
+          fetchQL(query, { token })
+            .then((data) => {
+              this.email = data.data.signInWithGoogle.email;
+              this.result = data;
+            })
+            .catch((data) => {
+              this.result = data;
+            });
+        });
     },
     signInWithFacebook(){
       FB.login((res) => {
@@ -140,7 +182,8 @@ export default {
               email
               message
               token
-              signInWithFacebook
+              facebookId
+              googleId
             }
           }
         `;
@@ -162,7 +205,8 @@ export default {
             email
             message
             token
-            signInWithFacebook
+            facebookId
+            googleId
           }
         }
       `;
@@ -184,7 +228,8 @@ export default {
             email
             message
             token
-            signInWithFacebook
+            facebookId
+            googleId
           }
         }
       `;
@@ -221,7 +266,8 @@ export default {
             email
             message
             token
-            signInWithFacebook
+            facebookId
+            googleId
           }
         }
       `;
@@ -231,6 +277,28 @@ export default {
         })
         .catch((data) => {
           this.result = data;
+        });
+    },
+    setEmail(){
+      const query = `
+        mutation kkkkkk($newEmail: String!){
+          setEmail(newEmail: $newEmail){
+            id
+            email
+            message
+            token
+            facebookId
+            googleId
+          }
+        }
+      `;
+      fetchQL(query, { newEmail: this.newEmail })
+        .then((data) => {
+          this.email = data.data.setEmail.email;
+          this.result = data;
+        })
+        .catch((err) => {
+          this.result = err;
         });
     }
   }
