@@ -7,20 +7,20 @@ const {
 const {
   UserType
 } = require("./types.js");
-const models = require("../models/user.js");
+const controller = require("../controller/user.js");
 
 const getUsers = {
   name:        "getUsers",
   description: "get users!",
   type:        new GraphQLList(UserType),
-  resolve:     (root, args) => models.getUsers(args)
+  resolve:     (root, args, context) => controller.getUsers(args, context)
 };
 
 const getCurrentUser = {
   name:        "getCurrentUser",
   description: "get current user!",
   type:        UserType,
-  resolve:     (root, args, context) => models.getCurrentUser(context)
+  resolve:     (root, args, context) => controller.getCurrentUser(args, context)
 };
 
 module.exports = new GraphQLObjectType({
