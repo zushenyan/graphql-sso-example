@@ -7,7 +7,7 @@ const {
 const {
   UserType
 } = require("./types.js");
-const models = require("../models/user.js");
+const controller = require("../controller/user.js");
 
 const signUp = {
   name:        "signUp",
@@ -18,7 +18,7 @@ const signUp = {
     confirmPassword: { type: new GraphQLNonNull(GraphQLString) }
   },
   type:    UserType,
-  resolve: (root, args, context) => models.signUp(args, context)
+  resolve: (root, args, context) => controller.signUp(args, context)
 };
 
 const signIn = {
@@ -29,7 +29,7 @@ const signIn = {
     password: { type: new GraphQLNonNull(GraphQLString) }
   },
   type:    UserType,
-  resolve: (root, args, context) => models.signIn(args, context)
+  resolve: (root, args, context) => controller.signIn(args, context)
 };
 
 const signInWithFacebook = {
@@ -40,7 +40,7 @@ const signInWithFacebook = {
     accessToken: { type: new GraphQLNonNull(GraphQLString) }
   },
   type:    UserType,
-  resolve: (root, args, context) => models.signInWithFacebook(args, context)
+  resolve: (root, args, context) => controller.signInWithFacebook(args, context)
 };
 
 const signInWithGoogle = {
@@ -50,14 +50,14 @@ const signInWithGoogle = {
     token: { type: new GraphQLNonNull(GraphQLString) },
   },
   type:    UserType,
-  resolve: (root, args, context) => models.signInWithGoogle(args, context)
+  resolve: (root, args, context) => controller.signInWithGoogle(args, context)
 };
 
 const signOut = {
   name:        "signOut",
   description: "sign out!",
   type:        GraphQLString,
-  resolve:     (root, args, context) => models.signOut(context)
+  resolve:     (root, args, context) => controller.signOut(args, context)
 };
 
 const setMessage = {
@@ -67,7 +67,7 @@ const setMessage = {
     message: { type: new GraphQLNonNull(GraphQLString) }
   },
   type:    UserType,
-  resolve: (root, args, context) => models.setMessage(args, context)
+  resolve: (root, args, context) => controller.setMessage(args, context)
 };
 
 const setEmail = {
@@ -77,7 +77,7 @@ const setEmail = {
     newEmail: { type: new GraphQLNonNull(GraphQLString) }
   },
   type:    UserType,
-  resolve: (root, args, context) => models.setEmail(args, context)
+  resolve: (root, args, context) => controller.setEmail(args, context)
 };
 
 module.exports = new GraphQLObjectType({
