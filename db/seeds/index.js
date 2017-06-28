@@ -1,17 +1,25 @@
-const users = [
-  {
-    email: "foobar@test.com",
-    password: "1234",
-    message: "first message"
-  },
-  {
-    email: "ggyy@test.com",
-    password: "4321",
-    message: "lallala"
-  }
-];
+const faker = require("faker");
+const _ = require("lodash");
 
-exports.seed = function(knex, Promise) {
-  return knex("users").del()
-    .then(() => knex("users").insert(users));
+faker.seed(123);
+faker.locale = "en_US";
+
+const users = _.range(5).map((val, index) => ({
+  id:       index + 1,
+  email:    faker.internet.email(),
+  password: faker.internet.password()
+}));
+
+const posts = users.map((val, index) => ({
+  id:      index + 1,
+  user_id: val.id,
+  content: faker.lorem.sentence()
+}));
+
+exports.seed = async function(knex, Promise) {
+  await knex("posts").del();
+  await knex("users").del();
+
+  await knex("users").insert(users);
+  await knex("posts").insert(posts);
 };
