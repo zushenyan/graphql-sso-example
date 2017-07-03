@@ -1,11 +1,23 @@
 // Update with your config settings.
 
 module.exports = {
+  test: {
+    client: 'pg',
+    connection: {
+      database: 'graphqlsso_test'
+    },
+    migrations: {
+      directory: './db/migrations'
+    },
+    seeds: {
+      directory: './db/seeds'
+    }
+  },
 
   development: {
     client: 'pg',
     connection: {
-      database: 'graphqlsso'
+      database: 'graphqlsso_development'
     },
     migrations: {
       directory: './db/migrations'

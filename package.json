@@ -8,6 +8,7 @@
   "dependencies": {
     "axios": "^0.16.2",
     "body-parser": "^1.17.2",
+    "chai-as-promised": "^7.1.0",
     "cookie-parser": "^1.4.3",
     "express": "^4.15.3",
     "express-graphql": "^0.6.6",
@@ -27,6 +28,7 @@
     "nodemon": "^1.11.0"
   },
   "scripts": {
+    "test": "NODE_ENV=test mocha -w --harmony ./**/*.spec.js",
     "nodemon": "nodemon",
     "knex": "knex"
   }
