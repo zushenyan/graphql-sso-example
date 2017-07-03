@@ -1,9 +1,9 @@
 const knex = require("../db/knex.js");
 
-module.exports.createUser  = (data) => knex("users").insert(data).returning("*");
-module.exports.updateUser  = (whereQuery, data) => knex("users").where(whereQuery).update({ ...data, updated_at: knex.fn.now() }).returning("*");
 module.exports.findUser    = (whereQuery) => knex("users").where(whereQuery).select();
 module.exports.getAllUsers = () => knex("users").select();
+module.exports.createUser  = (data) => knex("users").insert(data).returning("*");
+module.exports.updateUser  = (whereQuery, data) => knex("users").where(whereQuery).update({ ...data, updated_at: knex.fn.now() }).returning("*");
 
 // const _              = require("lodash");
 // const { generateID } = require("../utils");
