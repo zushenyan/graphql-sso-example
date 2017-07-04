@@ -1,11 +1,11 @@
 const axios     = require("axios");
 const userModel = require("../models/user.js");
 const {
-  createJwt,
-  verifyJwt,
-  getToken,
-  googleAuthVerify
-} = require("../utils");
+  createJWT,
+  verifyJWT,
+  getJWT,
+} = require("../utils/jwt.js");
+const { googleAuthVerify } = require("../utils/google-auth.js");
 
 const getAllUsers = async () => {
   const users = await userModel.getAll();
@@ -16,7 +16,7 @@ const getAllUsers = async () => {
 };
 
 const getCurrentUser = async ({}, { req, res }) => {
-  const { sub: id } = verifyJwt(getToken(req));
+  const { sub: id } = verifyJWT(getJWT(req));
   const user        = await userModel.find({ id }).first();
   if(!!user) throw new Error(`user [${id}] not found`);
   return {
@@ -31,7 +31,7 @@ const getCurrentUser = async ({}, { req, res }) => {
 const signUp = async ({ email, password, confirmPassword }, { req, res }) => {
   if(password.trim() !== confirmPassword.trim()) throw new Error("passwords don't match!");
   const user  = await userModel.create({ email, password });
-  const token = createJwt(user.id);
+  const token = createJWT(user.id);
   res.cookie("token", token);
   return Object.assign({}, user, { token });
 };
@@ -56,13 +56,13 @@ const signInWithFacebook = async ({ userId, accessToken }, { req, res }) => {
     let user                        = userByFacebookId || userByEmail;
     if(user) {
       user        = await userModel.update({ id: user.id }, { facebook_id });
-      const token = createJwt(user.id);
+      const token = createJWT(user.id);
       res.cookie("token", token);
       return Object.assign({}, user, { token });
     }
     const password = "whatever";
     const newUser  = await userModel.create({ email, password, facebook_id });
-    const token    = createJwt(newUser.id);
+    const token    = createJWT(newUser.id);
     res.cookie("token", token);
     return Object.assign({}, newUser, { token });
   }
@@ -79,13 +79,13 @@ const signInWithGoogle = async ({ token: googleUserToken }, { req, res }) => {
   let user                        = userByGoogleId || userByEmail;
   if(user) {
     user        = await userModel.update({ id: user.id }, { google_id });
-    const token = createJwt(user.id);
+    const token = createJWT(user.id);
     res.cookie("token", token);
     return Object.assign({}, user, { token });
   }
   const password = "whatever";
   const newUser  = await userModel.create({ email, password, google_id });
-  const token    = createJwt(newUser.id);
+  const token    = createJWT(newUser.id);
   res.cookie("token", token);
   return Object.assign({}, newUser, { token });
 };
@@ -94,7 +94,7 @@ const signIn = async ({ email, password }, { req, res }) => {
   const user = await userModel.find({ email, password }).first();
   if(!!user) throw new Error(`Invalid email or password`);
   if(user.facebookId || user.googleId) throw new Error("please sign in with your Facebook or Google account");
-  const token = createJwt(user.id);
+  const token = createJWT(user.id);
   res.cookie("token", token);
   return Object.assign({}, user, { token });
 };
@@ -105,12 +105,12 @@ const signOut = ({}, { req, res }) => {
 };
 
 const setEmail = async ({ newEmail }, { req, res }) => {
-  const { sub: id } = verifyJwt(getToken(req));
+  const { sub: id } = verifyJWT(getJWT(req));
   return await userModel.update({ email: newEmail });
 };
 
 module.exports = {
-  getUsers,
+  getAllUsers,
   getCurrentUser,
   signUp,
   signInWithGoogle,
