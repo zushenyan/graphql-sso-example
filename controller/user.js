@@ -1,5 +1,5 @@
-const axios      = require("axios");
-const userModel  = require("../models/user.js");
+const axios     = require("axios");
+const userModel = require("../models/user.js");
 const {
   createJwt,
   verifyJwt,
@@ -7,29 +7,30 @@ const {
   googleAuthVerify
 } = require("../utils");
 
-// prepare users data
-userModel.createUser({ email: "foobar@test.com", password: "1234", confirmPassword: "1234" });
-userModel.createUser({ email: "ggyy@test.com", password: "4321", confirmPassword: "4321" });
-
-const getUsers = () => userModel.getAllUsers();
-
-const getCurrentUser = ({}, { req, res }) => {
-  const { sub: id } = verifyJwt(getToken(req));
-  const user        = userModel.getUserById(id);
-  if(user) {
-    return {
-      id:         user.id,
-      email:      user.email,
-      message:    user.message,
-      facebookId: user.facebookId,
-      googleId:   user.googleId
-    };
-  }
-  throw new Error(`user [${id}] not found`);
+const getAllUsers = async () => {
+  const users = await userModel.getAll();
+  return users.map((user) => ({
+    id:    user.id,
+    email: user.email
+  }));
 };
 
-const signUp = ({ email, password, confirmPassword }, { req, res }) => {
-  const user = userModel.createUser({email, password, confirmPassword});
+const getCurrentUser = async ({}, { req, res }) => {
+  const { sub: id } = verifyJwt(getToken(req));
+  const user        = await userModel.find({ id }).first();
+  if(!!user) throw new Error(`user [${id}] not found`);
+  return {
+    id:         user.id,
+    email:      user.email,
+    message:    user.message,
+    facebookId: user.facebookId,
+    googleId:   user.googleId
+  };
+};
+
+const signUp = async ({ email, password, confirmPassword }, { req, res }) => {
+  if(password.trim() !== confirmPassword.trim()) throw new Error("passwords don't match!");
+  const user  = await userModel.create({ email, password });
   const token = createJwt(user.id);
   res.cookie("token", token);
   return Object.assign({}, user, { token });
@@ -49,18 +50,18 @@ const signInWithFacebook = async ({ userId, accessToken }, { req, res }) => {
         fields:       "id,email"
       }
     });
-    const { id: facebookId, email } = data;
-    const userByFacebookId          = userModel.getUserByFacebookId(facebookId);
-    const userByEmail               = userModel.getUserByEmail(email);
+    const { id: facebook_id, email } = data;
+    const userByFacebookId          = await userModel.find({ facebook_id });
+    const userByEmail               = await userModel.find({ email });
     let user                        = userByFacebookId || userByEmail;
     if(user) {
-      user        = userModel.updateUser({ id: user.id, data: { facebookId }});
+      user        = await userModel.update({ id: user.id }, { facebook_id });
       const token = createJwt(user.id);
       res.cookie("token", token);
       return Object.assign({}, user, { token });
     }
     const password = "whatever";
-    const newUser  = userModel.createUser({ email, password, confirmPassword: password, facebookId });
+    const newUser  = await userModel.create({ email, password, facebook_id });
     const token    = createJwt(newUser.id);
     res.cookie("token", token);
     return Object.assign({}, newUser, { token });
@@ -72,32 +73,30 @@ const signInWithFacebook = async ({ userId, accessToken }, { req, res }) => {
 };
 
 const signInWithGoogle = async ({ token: googleUserToken }, { req, res }) => {
-  const { sub: googleId, email } = await googleAuthVerify(googleUserToken);
-  const userByGoogleId           = userModel.getUserByGoogleId(googleId);
-  const userByEmail              = userModel.getUserByEmail(email);
-  let user                       = userByGoogleId || userByEmail;
+  const { sub: google_id, email } = await googleAuthVerify(googleUserToken);
+  const userByGoogleId            = await userModel.find({ google_id });
+  const userByEmail               = await userModel.find({ email });
+  let user                        = userByGoogleId || userByEmail;
   if(user) {
-    user        = userModel.updateUser({ id: user.id, data: { googleId }});
+    user        = await userModel.update({ id: user.id }, { google_id });
     const token = createJwt(user.id);
     res.cookie("token", token);
     return Object.assign({}, user, { token });
   }
   const password = "whatever";
-  const newUser  = userModel.createUser({ email, password, confirmPassword: password, googleId });
+  const newUser  = await userModel.create({ email, password, google_id });
   const token    = createJwt(newUser.id);
   res.cookie("token", token);
   return Object.assign({}, newUser, { token });
 };
 
-const signIn = ({ email, password }, { req, res }) => {
-  const user = userModel.getUserByAuth(email, password);
-  if(user) {
-    if(user.facebookId || user.gooleId) throw new Error("please sign in with your Facebook or Google account");
-    const token = createJwt(user.id);
-    res.cookie("token", token);
-    return Object.assign({}, user, { token });
-  }
-  throw new Error(`Invalid email or password`);
+const signIn = async ({ email, password }, { req, res }) => {
+  const user = await userModel.find({ email, password }).first();
+  if(!!user) throw new Error(`Invalid email or password`);
+  if(user.facebookId || user.googleId) throw new Error("please sign in with your Facebook or Google account");
+  const token = createJwt(user.id);
+  res.cookie("token", token);
+  return Object.assign({}, user, { token });
 };
 
 const signOut = ({}, { req, res }) => {
@@ -105,21 +104,9 @@ const signOut = ({}, { req, res }) => {
   return "sign out successfuly";
 };
 
-const setMessage = ({ message }, { req, res }) => {
-  try {
-    const { sub: id } = verifyJwt(getToken(req));
-    return userModel.updateUser({ id, data: { message }});
-  }
-  catch(err) {
-    throw new Error(err.message);
-  }
-};
-
-const setEmail = ({ newEmail }, { req, res }) => {
+const setEmail = async ({ newEmail }, { req, res }) => {
   const { sub: id } = verifyJwt(getToken(req));
-  const emailTaken  = userModel.getUserByEmail(newEmail);
-  if(emailTaken) throw new Error(`${newEmail} has already been taken.`);
-  return userModel.updateUser({ id, data: { email: newEmail }});
+  return await userModel.update({ email: newEmail });
 };
 
 module.exports = {
@@ -130,6 +117,5 @@ module.exports = {
   signInWithFacebook,
   signIn,
   signOut,
-  setMessage,
   setEmail
 };

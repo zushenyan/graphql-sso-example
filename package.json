@@ -8,13 +8,13 @@
   "dependencies": {
     "axios": "^0.16.2",
     "body-parser": "^1.17.2",
-    "chai-as-promised": "^7.1.0",
     "cookie-parser": "^1.4.3",
     "express": "^4.15.3",
     "express-graphql": "^0.6.6",
     "faker": "^4.1.0",
     "google-auth-library": "^0.10.0",
     "graphql": "^0.10.1",
+    "jest": "^20.0.4",
     "jsonwebtoken": "^7.4.1",
     "knex": "^0.13.0",
     "lodash": "^4.17.4",
@@ -23,12 +23,10 @@
     "uuid": "^3.0.1"
   },
   "devDependencies": {
-    "chai": "^4.0.2",
-    "mocha": "^3.4.2",
     "nodemon": "^1.11.0"
   },
   "scripts": {
-    "test": "NODE_ENV=test mocha -w --harmony ./**/*.spec.js",
+    "test": "NODE_ENV=test jest --watch",
     "nodemon": "nodemon",
     "knex": "knex"
   }
