@@ -12,7 +12,6 @@ const users = _.range(5).map((val, index) => ({
 
 const posts = _.range(10).map((val, index) => {
   const userId = Math.floor(Math.random() * users.length) + 1;
-
   return {
     id:      index + 1,
     user_id: userId,

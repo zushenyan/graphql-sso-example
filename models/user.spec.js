@@ -1,84 +1,86 @@
-const chai           = require("chai");
-const chaiAsPromised = require("chai-as-promised");
-const knex           = require("../db/knex.js");
-const userModel      = require("./user.js");
-
-chai.use(chaiAsPromised);
-
-const assert = chai.assert;
+const knex      = require("../db/knex.js");
+const userModel = require("./user.js");
 
 describe("models/user.js", () => {
-  before(async () => {
+  beforeAll(async () => {
     await knex.migrate.rollback();
     await knex.migrate.latest();
+  });
+
+  afterAll(async () => {
+    await knex.destroy();
   });
 
   beforeEach(async () => {
     await knex.seed.run();
   });
 
-  describe("findUser", () => {
-    it("should find a user", async () => {
-      const id = 1;
-      const data1 = await userModel.findUser({ id });
-      const data2 = await knex("users").where({ id }).select();
-      assert(data1 === data2, "dasdas");
+  describe("find", () => {
+    it("should find rows", async () => {
+      const query = { id: 1 };
+      const data1 = await userModel.find(query);
+      const data2 = await knex("users")
+        .where(query)
+        .first();
+      expect(data1[0]).toEqual(data2);
     });
   });
 
-  describe("getAllUsers", () => {
-    it("should get all users", async () => {
-      const data1 = await userModel.getAllUsers();
+  describe("getAll", () => {
+    it("should get all rows", async () => {
+      const data1 = await userModel.getAll();
       const data2 = await knex("users").select();
-      assert(data1 === data2);
+      expect(data1).toEqual(data2);
     });
   });
 
-  describe("createUser", () => {
-    it("should create a user", async () => {
+  describe("create", () => {
+    it("should create a row", async () => {
       const user  = { email: "foobar@test.com", password: "5566" };
-      const data1 = await userModel.createUser(user).first();
-      const data2 = await knex("users").select().orderBy("created_at", "desc").first();
-      assert(data1 === data2);
+      const data1 = await userModel.create(user);
+      const data2 = await knex("users").orderBy("created_at", "desc").first();
+      expect(data1[0]).toEqual(data2);
     });
 
     it("should throw error with absent of options", async () => {
-      assert.isRejected(userModel.createUser({ password: "1234" }));
-      assert.isRejected(userModel.createUser({ email: "hahaha@test.com" }));
+      await expect(userModel.create({ password: "1234" })).rejects.toBeDefined();
+      await expect(userModel.create({ email: "hahaha@test.com" })).rejects.toBeDefined();
     });
 
-    it("should throw error when trying to create account with duplciated email, facebook_id or google_id", async () => {
+    it("should throw error when trying to create a row with duplciated unique columns", async () => {
       const facebook_id = "foo";
       const google_id   = "bar";
+      const query       = { id: 1 };
       const data        = await knex("users").where("id", 1).first();
-      await knex("users").where("id", 1).update({ facebook_id, google_id });
-      assert.isRejected(userModel.createUser({ email: data.email, password: "123456" }));
-      assert.isRejected(userModel.createUser({ email: "foo@test.com", password: "123456", facebook_id }));
-      assert.isRejected(userModel.createUser({ email: "bar@test.com", password: "123456", google_id }));
+      await knex("users").where(query).update({ facebook_id, google_id });
+      await expect(userModel.create({ email: data.email, password: "123456" })).rejects.toBeDefined();
+      await expect(userModel.create({ email: "foo@test.com", password: "123456", facebook_id })).rejects.toBeDefined();
+      await expect(userModel.create({ email: "bar@test.com", password: "123456", google_id })).rejects.toBeDefined();
     });
   });
 
-  describe("updateUser", () => {
+  describe("update", () => {
     const newData = { email: "hahah@test.com", password: "9999", facebook_id: "foo", google_id: "bar" };
 
-    it("should update user and its updated_at", async () => {
-      const id    = 1;
-      const data1 = await knex("users").where({ id }).first();
-      const data2 = await userModel.updateUser({ id }, newData).first();
-      assert(data1 !== data2);
-      assert(data1.updated_at !== data2.updated_at);
+    it("should update rows and its updated_at", async () => {
+      const query = { id: 1 };
+      const data1 = await knex("users").where(query).first();
+      const data2 = await userModel.update(query, newData);
+      expect(data1).not.toEqual(data2[0]);
+      expect(data1.updated_at).not.toEqual(data2[0].updated_at);
     });
 
-    it("should update nothing when user not found", async () => {
-      const data = await userModel.updateUser({ id: 10 }, newData);
-      assert(data === []);
+    it("should update nothing when it's not found", async () => {
+      const query = { id: 10 };
+      const data = await userModel.update(query, newData);
+      expect(data).toEqual([]);
     });
 
     it("should throw error when assigning already exist email", async () => {
-      const data1 = await knex("users").where({ id: 1 }).first();
-      let err     = null;
-      try { await userModel.updateUser({ id: 2 }, { email: data1.email }); } catch(e) { err = e; }
-      assert.exists(err);
+      const query1 = { id: 1 };
+      const query2 = { id: 2 };
+      const data1 = await knex("users").where(query1).first();
+      await expect(userModel.update(query2, { email: data1.email })).rejects.toBeDefined();
     });
   });
 });

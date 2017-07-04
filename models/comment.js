@@ -1,7 +1,31 @@
 const knex = require("../db/knex.js");
 
-module.exports.findComment    = (whereQuery) => knex("comments").where(whereQuery).select().join("uesrs", "users.id", "=", "comments.user_id");
-module.exports.getAllComments = () => knex("comments").select();
-module.exports.createComment  = (data) => knex("comments").insert(data).returning("*");
-module.exports.updateComment  = (whereQuery, data) => knex("comments").update({ ...data,  updated_at: knex.fn.now() }).returning("*");
-module.exports.deleteComment  = (whereQuery) => knex("comments").where(whereQuery).del().returning("*");
+module.exports.find = (whereQuery) =>
+  knex("comments")
+    .where(whereQuery)
+    .join("posts", "posts.id", "=", "comments.post_id")
+    .join("users", "users.id", "=", "comments.user_id")
+    .select("*");
+
+module.exports.getAll = () =>
+  knex("comments")
+    .join("posts", "posts.id", "=", "comments.post_id")
+    .join("users", "users.id", "=", "comments.user_id")
+    .select("*");
+
+module.exports.create = (data) =>
+  knex("comments")
+    .insert(data)
+    .returning("*");
+
+module.exports.update = (whereQuery, data) =>
+  knex("comments")
+    .where(whereQuery)
+    .update(Object.assign({}, data, { updated_at: knex.fn.now() }))
+    .returning("*");
+
+module.exports.del = (whereQuery) =>
+  knex("comments")
+    .where(whereQuery)
+    .del()
+    .returning("*");
