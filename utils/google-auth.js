@@ -1,12 +1,12 @@
 const GoogleAuth       = require("google-auth-library");
 const googleAuthConfig = require("../config/google-auth.js");
 
-const auth   = new GoogleAuth;
+const auth   = new GoogleAuth();
 const client = new auth.OAuth2(googleAuthConfig.clientId, "", "");
 
-module.exports.googleAuthVerify = (googleUserToken) => new Promise((res, rej) => {
+module.exports.googleAuthVerify = (idToken) => new Promise((res, rej) => {
   client.verifyIdToken(
-    googleUserToken,
+    idToken,
     googleAuthConfig.clientId,
     (err, login) => err ? rej(err) : res(login.getPayload())
   );

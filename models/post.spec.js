@@ -35,9 +35,9 @@ describe("models/post.js", () => {
   describe("create", () => {
     it("should create a row", async () => {
       const post  = { user_id: 1, title: "foobar is good", content: "whahahah" };
-      const data1 = await postModel.create(post);
+      const data1 = (await postModel.create(post))[0];
       const data2 = await knex("posts").orderBy("created_at", "desc").first();
-      expect(data1[0]).toEqual(data2);
+      expect(data1).toEqual(data2);
     });
 
     it("should throw error with absent of options", async () => {
@@ -52,9 +52,9 @@ describe("models/post.js", () => {
     it("should update rows and its updated_at", async () => {
       const query = { id: 1 };
       const data1 = await knex("posts").where(query).first();
-      const data2 = await postModel.update(query, newData);
-      expect(data1).not.toEqual(data2[0]);
-      expect(data1.updated_at).not.toEqual(data2[0].updated_at);
+      const data2 = (await postModel.update(query, newData))[0];
+      expect(data1).not.toEqual(data2);
+      expect(data1.updated_at).not.toEqual(data2.updated_at);
     });
 
     it("should update nothing when it's not found", async () => {
@@ -69,12 +69,13 @@ describe("models/post.js", () => {
       await knex("comments").truncate();
       const query = { id: 1 };
       const data1 = await postModel.del(query);
-      const data2 = await knex("posts").where(query).first();
-      expect(data2).toBe(undefined);
+      const data2 = await knex("posts").where(query).select("*");
+      expect(data2).toEqual([]);
     });
 
     it("should delete nothing when it doesn't exist", async () => {
-      const data = await postModel.del({ id: 20 });
+      const query = { id: 20 };
+      const data  = await postModel.del(query);
       expect(data).toEqual([]);
     });
   });

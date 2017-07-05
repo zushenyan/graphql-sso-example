@@ -19,9 +19,7 @@ describe("models/user.js", () => {
     it("should find rows", async () => {
       const query = { id: 1 };
       const data1 = await userModel.find(query);
-      const data2 = await knex("users")
-        .where(query)
-        .first();
+      const data2 = await knex("users").where(query).first();
       expect(data1[0]).toEqual(data2);
     });
   });
@@ -37,9 +35,9 @@ describe("models/user.js", () => {
   describe("create", () => {
     it("should create a row", async () => {
       const user  = { email: "foobar@test.com", password: "5566" };
-      const data1 = await userModel.create(user);
+      const data1 = (await userModel.create(user))[0];
       const data2 = await knex("users").orderBy("created_at", "desc").first();
-      expect(data1[0]).toEqual(data2);
+      expect(data1).toEqual(data2);
     });
 
     it("should throw error with absent of options", async () => {
@@ -65,9 +63,9 @@ describe("models/user.js", () => {
     it("should update rows and its updated_at", async () => {
       const query = { id: 1 };
       const data1 = await knex("users").where(query).first();
-      const data2 = await userModel.update(query, newData);
-      expect(data1).not.toEqual(data2[0]);
-      expect(data1.updated_at).not.toEqual(data2[0].updated_at);
+      const data2 = (await userModel.update(query, newData))[0];
+      expect(data1).not.toEqual(data2);
+      expect(data1.updated_at).not.toEqual(data2.updated_at);
     });
 
     it("should update nothing when it's not found", async () => {

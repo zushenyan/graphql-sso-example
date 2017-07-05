@@ -1,3 +1,3 @@
 module.exports = {
-  clientId: "251705430658-ohq7k8m1qn0te2rbti8dm7dknjc5da73.apps.googleusercontent.com"
+  clientId: "251705430658-8srvl2c4lisschflk5pmd4tggmjcfkkp.apps.googleusercontent.com"
 };
