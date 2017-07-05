@@ -7,7 +7,7 @@ const {
 describe("utils/jwt.js", () => {
   describe("createJWT", () => {
     it("should create JWT", () => {
-      const id      = "123";
+      const id      = 123;
       const payload = { foo: "bar" };
       expect(createJWT(id, payload)).toBeDefined();
     });
@@ -15,7 +15,7 @@ describe("utils/jwt.js", () => {
 
   describe("verifyJWT", () => {
     it("should verify JWT ", () => {
-      const id      = "123";
+      const id      = 123;
       const payload = { foo: "bar" };
       const token   = createJWT(id, payload);
       expect(() => verifyJWT(token)).not.toThrow();

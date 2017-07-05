@@ -6,7 +6,7 @@ module.exports.createJWT = (id, payload = {}) => jwt.sign(
   payload,
   jwtConfig.secret,
   {
-    subject:   id,
+    subject:   id.toString(),
     expiresIn: jwtConfig.expiresIn
   }
 );
