@@ -44,7 +44,7 @@ const signUp = async ({ email, password, confirmPassword }) => {
 };
 
 const signIn = async ({ email, password }) => {
-  const user = (await userModel.find({ email, password }))[0];
+  const user = await userModel.find({ email, password }).first();
   if(!user) throw new Error(`Invalid email or password`);
   // if(user.facebookId || user.googleId) throw new Error("please sign in with your Facebook or Google account");
   // res.cookie("token", token);
@@ -70,8 +70,8 @@ const signInWithFacebook = async ({ userId, accessToken }) => {
   }
 };
 
-const signInWithGoogle = async ({ token: googleUserToken }, { req, res }) => {
-  const { sub: google_id, email } = await googleAuthVerify(googleUserToken);
+const signInWithGoogle = async ({ idToken }, { req, res }) => {
+  const { sub: google_id, email } = await googleAuthVerify(idToken);
   const existUser                 = await userModel.find({ google_id }).first() || await userModel.find({ email }).first();
   const updatedUser               = (
     existUser ?
