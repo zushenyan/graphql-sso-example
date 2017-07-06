@@ -152,8 +152,58 @@ describe("controller/user.js", () => {
   });
 
   describe("signInWithFacebook", () => {
-    it("should work", () => {
+    it("should create account with facebook profile when sign in", async () => {
+      const fakeFacebookSignIn = (userId, accessToken) => ({
+        id:    "7788",
+        email: "facebook_lalala@test.com"
+      });
+      const result         = await userController.signInWithFacebook(() => fakeFacebookSignIn("whatever", "whatever"));
+      const user           = await knex("users").where({ id: result.id }).first();
+      const publicUserInfo = userController.generatePublicUserInfo(user);
+      expect(result.token).toBeDefined();
+      delete result.token;
+      expect(result).toEqual(publicUserInfo);
+    });
 
+    it("should update account with facebook id when sign in", async () => {
+      const query              = { id: 1 };
+      const existUser          = await knex("users").where(query).first();
+      const fakeFacebookSignIn = (userId, accessToken) => ({
+        id:    "5556666",
+        email: existUser.email
+      });
+      const result         = await userController.signInWithFacebook(() => fakeFacebookSignIn("whatever", "whatever"));
+      const publicUserInfo = userController.generatePublicUserInfo(existUser);
+      expect(result.token).toBeDefined();
+      expect(result.facebook_id).toBeDefined();
+    });
+  });
+
+  describe("signInWithGoogle", () => {
+    it("should create account with google profile when sign in", async () => {
+      const fakeGoogleSignIn = (userId, accessToken) => ({
+        sub:   "77887788",
+        email: "google_lalala@test.com"
+      });
+      const result         = await userController.signInWithGoogle(() => fakeGoogleSignIn("whatever"));
+      const user           = await knex("users").where({ id: result.id }).first();
+      const publicUserInfo = userController.generatePublicUserInfo(user);
+      expect(result.token).toBeDefined();
+      delete result.token;
+      expect(result).toEqual(publicUserInfo);
+    });
+
+    it("should update account with google id when sign in", async () => {
+      const query            = { id: 1 };
+      const existUser        = await knex("users").where(query).first();
+      const fakeGoogleSignIn = (userId, accessToken) => ({
+        sub:   "5556666",
+        email: existUser.email
+      });
+      const result         = await userController.signInWithGoogle(() => fakeGoogleSignIn("whatever", "whatever"));
+      const publicUserInfo = userController.generatePublicUserInfo(existUser);
+      expect(result.token).toBeDefined();
+      expect(result.facebook_id).toBeDefined();
     });
   });
 

@@ -51,35 +51,28 @@ const signIn = async ({ email, password }) => {
   return Object.assign({}, generatePublicUserInfo(user), { token: createJWT(user.id) });
 };
 
-const signInWithFacebook = async ({ userId, accessToken }) => {
-  try {
-    const { data }                   = facebookAuthVerify({ userId, accessToken });
-    const { id: facebook_id, email } = data;
-    const existUser                  = await userModel.find({ facebook_id }).first() || await userModel.find({ email }).first();
-    const updatedUser                = (
-      existUser ?
-      await userModel.update({ id: user.id }, { facebook_id }) :
-      await userModel.create({ email, password: "whatever", facebook_id })
-    )[0];
-    // res.cookie("token", token);
-    return Object.assign({}, updatedUser, { token: createJWT(updatedUser.id) });
-  }
-  catch(err){
-    if(err.response) throw err.response.data.error.message;
-    throw err;
-  }
+const signInWithFacebook = async (verify) => {
+  const { id: facebook_id, email } = await verify();
+  const existUser                  = await userModel.find({ facebook_id }).first() || await userModel.find({ email }).first();
+  const updatedUser                = (
+    existUser ?
+    await userModel.update({ id: existUser.id }, { facebook_id }) :
+    await userModel.create({ email, password: "whatever", facebook_id })
+  )[0];
+  // res.cookie("token", token);
+  return Object.assign({}, generatePublicUserInfo(updatedUser), { token: createJWT(updatedUser.id) });
 };
 
-const signInWithGoogle = async ({ idToken }, { req, res }) => {
-  const { sub: google_id, email } = await googleAuthVerify(idToken);
+const signInWithGoogle = async (verify) => {
+  const { sub: google_id, email } = await verify();
   const existUser                 = await userModel.find({ google_id }).first() || await userModel.find({ email }).first();
   const updatedUser               = (
     existUser ?
-    await userModel.update({ id: user.id }, { google_id }) :
+    await userModel.update({ id: existUser.id }, { google_id }) :
     await userModel.create({ email, password: "whatever", google_id })
   )[0];
   // res.cookie("token", token);
-  return Object.assign({}, updatedUser, { token: createJWT(updatedUser.id) });
+  return Object.assign({}, generatePublicUserInfo(updatedUser), { token: createJWT(updatedUser.id) });
 };
 
 const signOut = () => {
