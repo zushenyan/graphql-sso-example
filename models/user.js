@@ -1,4 +1,4 @@
-const knex = require("../db/knex.js");
+const knex = require("db/knex.js");
 
 module.exports.find = (whereQuery) =>
   knex("users")

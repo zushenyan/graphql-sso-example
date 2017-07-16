@@ -1,4 +1,4 @@
-const knex      = require("../db/knex.js");
+const knex      = require("db/knex.js");
 const postModel = require("./post.js");
 
 describe("models/post.js", () => {
@@ -41,7 +41,7 @@ describe("models/post.js", () => {
     });
 
     it("should throw error with absent of options", async () => {
-      expect(postModel.create({ content: "kkkkk" })).rejects.toBeDefined();
+      await expect(postModel.create({ content: "kkkkk" })).rejects.toBeDefined();
     });
   });
 

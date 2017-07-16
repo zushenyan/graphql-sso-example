@@ -4,10 +4,10 @@ const {
   GraphQLNonNull
 }                        = require("graphql");
 const UserType           = require("./types.js");
-const controller         = require("../../../controller/user.js");
-const cookieKeys         = require("../../../config/cookie-keys.js");
-const facebookAuthVerify = require("../../../utils/facebook-auth/auth.js");
-const googleAuthVerify   = require("../../../utils/google-auth/auth.js");
+const controller         = require("controller/user.js");
+const cookieKeys         = require("config/cookie-keys.js");
+const facebookAuthVerify = require("utils/facebook-auth/auth.js");
+const googleAuthVerify   = require("utils/google-auth/auth.js");
 
 module.exports.signUp = {
   name:        "signUp",

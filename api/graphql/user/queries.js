@@ -4,7 +4,7 @@ const {
   GraphQLList
 } = require("graphql");
 const UserType = require("./types.js");
-const controller = require("../../../controller/user.js");
+const controller = require("controller/user.js");
 
 module.exports.getAllUsers = {
   name:        "getAllUsers",

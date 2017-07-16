@@ -1,8 +1,8 @@
-const userModel = require("../models/user.js");
+const userModel = require("models/user.js");
 const {
   createJWT,
   verifyJWT
-} = require("../utils/jwt.js");
+} = require("utils/jwt.js");
 
 const generatePublicUserInfo = (user) => ({
   id:          user.id,
@@ -21,7 +21,12 @@ const getAllUsers = async () => {
 const getCurrentUser = async ({ jwt }) => {
   const { sub: id } = verifyJWT(jwt);
   const user        = await userModel.find({ id }).first();
-  if(!user) throw new Error(`user id ${id} not found`);
+  if(!user){
+    return {
+      status:  404,
+      message: `user ${id} not found`
+    };
+  }
   return generatePublicUserInfo(user);
 };
 
@@ -35,14 +40,24 @@ const updateUser = async ({ token, newData }) => {
 };
 
 const signUp = async ({ email, password, confirmPassword }) => {
-  if(password.trim() !== confirmPassword.trim()) throw new Error("passwords don't match!");
+  if(password.trim() !== confirmPassword.trim()) {
+    return {
+      status:  400,
+      message: `passwords don't match!`
+    }
+  };
   const user  = (await userModel.create({ email, password }))[0];
   return Object.assign({}, generatePublicUserInfo(user), { token: createJWT(user.id) });
 };
 
 const signIn = async ({ email, password }) => {
   const user = await userModel.find({ email, password }).first();
-  if(!user) throw new Error(`Invalid email or password`);
+  if(!user){
+    return {
+      status:  401,
+      message: `Invalid email or password`
+    };
+  }
   return Object.assign({}, generatePublicUserInfo(user), { token: createJWT(user.id) });
 };
 

@@ -1,6 +1,6 @@
 const jwt          = require("jsonwebtoken");
-const jwtConfig    = require("../config/jwt.js");
-const cookieConfig = require("../config/cookie-keys.js");
+const jwtConfig    = require("config/jwt.js");
+const cookieConfig = require("config/cookie-keys.js");
 
 module.exports.createJWT = (id, payload = {}) => jwt.sign(
   payload,

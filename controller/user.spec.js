@@ -1,6 +1,6 @@
 const userController = require("./user.js");
-const knex           = require("../db/knex.js");
-const { createJWT }  = require("../utils/jwt.js");
+const knex           = require("db/knex.js");
+const { createJWT }  = require("utils/jwt.js");
 
 describe("controller/user.js", () => {
   beforeAll(async () => {
@@ -60,8 +60,15 @@ describe("controller/user.js", () => {
     });
 
     it("should throw error when token is invalid", async () => {
-      const jwt = createJWT(5566, {});
-      expect(userController.getCurrentUser({ jwt })).rejects.toBeDefined();
+      const jwt = "blah.blah.blah";
+      await expect(userController.getCurrentUser({ jwt })).rejects.toBeDefined();
+    });
+
+    it("should response 404 when id is not found", async () => {
+      const jwt = createJWT(6, {});
+      await expect(userController.getCurrentUser({ jwt })).resolves.toMatchObject({
+        status: 404
+      });
     });
   });
 
@@ -88,7 +95,7 @@ describe("controller/user.js", () => {
       const user    = await knex("users").where(query).first();
       const token   = createJWT(2);
       const newData = { email: user.email };
-      expect(userController.updateUser({ token, newData })).rejects.toBeDefined();
+      await expect(userController.updateUser({ token, newData })).rejects.toBeDefined();
     });
   });
 
@@ -99,7 +106,7 @@ describe("controller/user.js", () => {
         password:        "9999",
         confirmPassword: "9999"
       };
-      expect(userController.signUp(data)).resolves.toBeDefined();
+      await expect(userController.signUp(data)).resolves.toBeDefined();
     });
 
     it("should fail when password doesn't match with confirmation password", async () => {
@@ -108,7 +115,7 @@ describe("controller/user.js", () => {
         password:        "9999",
         confirmPassword: "8888"
       };
-      expect(userController.signUp(data)).rejects.toBeDefined();
+      await expect(userController.signUp(data)).resolves.toMatchObject({ status: 400 });
     });
 
     it("should fail when email already exists", async () => {
@@ -119,7 +126,7 @@ describe("controller/user.js", () => {
         password:        "9999",
         confirmPassword: "9999"
       };
-      expect(userController.signUp(data)).rejects.toBeDefined();
+      await expect(userController.signUp(data)).rejects.toBeDefined();
     });
   });
 
@@ -131,7 +138,7 @@ describe("controller/user.js", () => {
         email:    user.email,
         password: user.password
       };
-      expect(await userController.signIn(data)).toBeDefined();
+      await expect(userController.signIn(data)).resolves.toBeDefined();
     });
 
     it("should not let user sign in when input wrong credential", async () => {
@@ -145,8 +152,8 @@ describe("controller/user.js", () => {
         email:    "nosuchemail@test.com",
         password: "happyfoobar"
       };
-      expect(userController.signIn(data1)).rejects.toBeDefined();
-      expect(userController.signIn(data2)).rejects.toBeDefined();
+      await expect(userController.signIn(data1)).resolves.toMatchObject({ status: 401 });
+      await expect(userController.signIn(data2)).resolves.toMatchObject({ status: 401 });
     });
   });
 
@@ -219,8 +226,8 @@ describe("controller/user.js", () => {
   });
 
   describe("signOut", () => {
-    it("should work", async () => {
-      expect(await userController.signOut()).toBeDefined();
+    it("should work", () => {
+      expect(userController.signOut()).toBeDefined();
     });
   });
 });
