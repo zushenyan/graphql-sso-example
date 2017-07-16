@@ -3,8 +3,6 @@ const {
   createJWT,
   verifyJWT
 } = require("../utils/jwt.js");
-const { googleAuthVerify }   = require("../utils/google-auth.js");
-const { facebookAuthVerify } = require("../utils/facebook-auth.js");
 
 const generatePublicUserInfo = (user) => ({
   id:          user.id,
@@ -39,44 +37,27 @@ const updateUser = async ({ token, newData }) => {
 const signUp = async ({ email, password, confirmPassword }) => {
   if(password.trim() !== confirmPassword.trim()) throw new Error("passwords don't match!");
   const user  = (await userModel.create({ email, password }))[0];
-  // res.cookie("token", token);
   return Object.assign({}, generatePublicUserInfo(user), { token: createJWT(user.id) });
 };
 
 const signIn = async ({ email, password }) => {
   const user = await userModel.find({ email, password }).first();
   if(!user) throw new Error(`Invalid email or password`);
-  // if(user.facebookId || user.googleId) throw new Error("please sign in with your Facebook or Google account");
-  // res.cookie("token", token);
   return Object.assign({}, generatePublicUserInfo(user), { token: createJWT(user.id) });
 };
 
-const signInWithFacebook = async (verify) => {
-  const { id: facebook_id, email } = await verify();
-  const existUser                  = await userModel.find({ facebook_id }).first() || await userModel.find({ email }).first();
-  const updatedUser                = (
+const signInWithSSO = async (vendorVerification, idColumnName) => {
+  const { id, email } = vendorVerification();
+  const existUser     = await userModel.find({ [idColumnName]: id }).first() || await userModel.find({ email }).first();
+  const updatedUser   = (
     existUser ?
-    await userModel.update({ id: existUser.id }, { facebook_id }) :
-    await userModel.create({ email, password: "whatever", facebook_id })
+    await userModel.update({ id: existUser.id }, { [idColumnName]: id }) :
+    await userModel.create({ email, password: "whatever", [idColumnName]: id })
   )[0];
-  // res.cookie("token", token);
-  return Object.assign({}, generatePublicUserInfo(updatedUser), { token: createJWT(updatedUser.id) });
-};
-
-const signInWithGoogle = async (verify) => {
-  const { sub: google_id, email } = await verify();
-  const existUser                 = await userModel.find({ google_id }).first() || await userModel.find({ email }).first();
-  const updatedUser               = (
-    existUser ?
-    await userModel.update({ id: existUser.id }, { google_id }) :
-    await userModel.create({ email, password: "whatever", google_id })
-  )[0];
-  // res.cookie("token", token);
   return Object.assign({}, generatePublicUserInfo(updatedUser), { token: createJWT(updatedUser.id) });
 };
 
 const signOut = () => {
-  // res.clearCookie("token");
   return {
     message: "sign out successfuly"
   };
@@ -88,8 +69,7 @@ module.exports = {
   getCurrentUser,
   updateUser,
   signUp,
-  signInWithGoogle,
-  signInWithFacebook,
   signIn,
+  signInWithSSO,
   signOut
 };

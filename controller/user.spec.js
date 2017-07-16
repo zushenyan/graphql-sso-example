@@ -83,7 +83,7 @@ describe("controller/user.js", () => {
       expect(result.updated_at).not.toEqual(user.updated_at);
     });
 
-    it("should fail when trying to set email owning by other user for current user", async () => {
+    it("should fail when trying to set email owned by other user for current user", async () => {
       const query = { id: 1 };
       const user    = await knex("users").where(query).first();
       const token   = createJWT(2);
@@ -99,8 +99,7 @@ describe("controller/user.js", () => {
         password:        "9999",
         confirmPassword: "9999"
       };
-      const result = await userController.signUp(data);
-      expect(result).toBeDefined();
+      expect(userController.signUp(data)).resolves.toBeDefined();
     });
 
     it("should fail when password doesn't match with confirmation password", async () => {
@@ -151,13 +150,15 @@ describe("controller/user.js", () => {
     });
   });
 
-  describe("signInWithFacebook", () => {
-    it("should create account with facebook profile when sign in", async () => {
-      const fakeFacebookSignIn = (userId, accessToken) => ({
-        id:    "7788",
-        email: "facebook_lalala@test.com"
-      });
-      const result         = await userController.signInWithFacebook(() => fakeFacebookSignIn("whatever", "whatever"));
+  describe("signInWithSSO", () => {
+    it("should create account with facebook profile", async () => {
+      const result         = await userController.signInWithSSO(
+        () => ({
+          id:    "fake_facebook_id",
+          email: "foobar123@test.com"
+        }),
+        "facebook_id"
+      );
       const user           = await knex("users").where({ id: result.id }).first();
       const publicUserInfo = userController.generatePublicUserInfo(user);
       expect(result.token).toBeDefined();
@@ -166,26 +167,27 @@ describe("controller/user.js", () => {
     });
 
     it("should update account with facebook id when sign in", async () => {
-      const query              = { id: 1 };
-      const existUser          = await knex("users").where(query).first();
-      const fakeFacebookSignIn = (userId, accessToken) => ({
-        id:    "5556666",
-        email: existUser.email
-      });
-      const result         = await userController.signInWithFacebook(() => fakeFacebookSignIn("whatever", "whatever"));
-      const publicUserInfo = userController.generatePublicUserInfo(existUser);
+      const query      = { id: 1 };
+      const existUser  = await knex("users").where(query).first();
+      const result     = await userController.signInWithSSO(
+        () => ({
+          id:    "weeeeeeee",
+          email: existUser.email
+        }),
+        "facebook_id"
+      );
       expect(result.token).toBeDefined();
       expect(result.facebook_id).toBeDefined();
     });
-  });
 
-  describe("signInWithGoogle", () => {
-    it("should create account with google profile when sign in", async () => {
-      const fakeGoogleSignIn = (userId, accessToken) => ({
-        sub:   "77887788",
-        email: "google_lalala@test.com"
-      });
-      const result         = await userController.signInWithGoogle(() => fakeGoogleSignIn("whatever"));
+    it("should create account with google profile", async () => {
+      const result         = await userController.signInWithSSO(
+        () => ({
+          id:    "fake_google_id",
+          email: "meowmeow@test.com"
+        }),
+        "google_id"
+      );
       const user           = await knex("users").where({ id: result.id }).first();
       const publicUserInfo = userController.generatePublicUserInfo(user);
       expect(result.token).toBeDefined();
@@ -194,16 +196,25 @@ describe("controller/user.js", () => {
     });
 
     it("should update account with google id when sign in", async () => {
-      const query            = { id: 1 };
-      const existUser        = await knex("users").where(query).first();
-      const fakeGoogleSignIn = (userId, accessToken) => ({
-        sub:   "5556666",
-        email: existUser.email
-      });
-      const result         = await userController.signInWithGoogle(() => fakeGoogleSignIn("whatever", "whatever"));
-      const publicUserInfo = userController.generatePublicUserInfo(existUser);
+      const query     = { id: 1 };
+      const existUser = await knex("users").where(query).first();
+      const result    = await userController.signInWithSSO(
+        () => ({
+          id:    "fake_google_id",
+          email: existUser.email
+        }),
+        "google_id"
+      );
       expect(result.token).toBeDefined();
-      expect(result.facebook_id).toBeDefined();
+      expect(result.google_id).toBeDefined();
+    });
+
+    it("should fail", async () => {
+      expect(userController.signInWithSSO(() => ({}), "facebook_id")).rejects.toBeDefined();
+      expect(userController.signInWithSSO(() => ({
+        id:    "1234",
+        email: "weeee@test.com"
+      }), "no_such_column")).rejects.toBeDefined();
     });
   });
 

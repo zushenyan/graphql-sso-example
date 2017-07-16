@@ -1,6 +1,10 @@
 const axios = require("axios");
+const {
+  responseFormatter,
+  errorFormatter
+} = require("./formatter.js");
 
-module.exports.facebookAuthVerify = (userId, accessToken) => new Promise((res, rej) => {
+module.exports = (userId, accessToken) => new Promise((res, rej) => {
   axios({
     url: `https://graph.facebook.com/v2.9/${userId}`,
     method: "GET",
@@ -13,6 +17,6 @@ module.exports.facebookAuthVerify = (userId, accessToken) => new Promise((res, r
       fields:       "id,email"
     }
   })
-  .then((result) => result.data)
-  .catch((err) => err.response ? rej(err.response.data.error.message) : err);
+  .then((data) => res(responseFormatter(data)))
+  .catch((err) => rej(errorFormatter(rer)));
 });

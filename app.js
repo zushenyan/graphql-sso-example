@@ -3,7 +3,7 @@ const express      = require("express");
 const morgan       = require("morgan");
 const cookieParser = require("cookie-parser");
 const graphqlHTTP  = require("express-graphql");
-const schema       = require("./api");
+const schema       = require("./api/graphql");
 const config       = require("./config/server.js");
 
 const sitePage =
@@ -27,7 +27,7 @@ const app =
   express()
     .use(morgan("combined"))
     .use(cookieParser())
-    // .use(graphqlAPI)
+    .use(graphqlAPI)
     .use(sitePage)
     .listen(config.port, () => {
       console.log(`server is running on port ${config.port}...`);

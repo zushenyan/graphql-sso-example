@@ -34,20 +34,19 @@ describe("models/post.js", () => {
 
   describe("create", () => {
     it("should create a row", async () => {
-      const post  = { user_id: 1, title: "foobar is good", content: "whahahah" };
+      const post  = { user_id: 1, content: "whahahah" };
       const data1 = (await postModel.create(post))[0];
       const data2 = await knex("posts").orderBy("created_at", "desc").first();
       expect(data1).toEqual(data2);
     });
 
     it("should throw error with absent of options", async () => {
-      expect(postModel.create({ title: "1234" })).rejects.toBeDefined();
       expect(postModel.create({ content: "kkkkk" })).rejects.toBeDefined();
     });
   });
 
   describe("update", () => {
-    const newData = { title: "aaaa", content: "bbbb" };
+    const newData = { content: "bbbb" };
 
     it("should update rows and its updated_at", async () => {
       const query = { id: 1 };
@@ -66,7 +65,6 @@ describe("models/post.js", () => {
 
   describe("delete", () => {
     it("should delete rows", async () => {
-      await knex("comments").truncate();
       const query = { id: 1 };
       const data1 = await postModel.del(query);
       const data2 = await knex("posts").where(query).select("*");
