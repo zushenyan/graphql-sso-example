@@ -19,9 +19,18 @@ module.exports.signUp = {
   },
   type:    UserType,
   resolve: async (root, args, context) => {
-    const result = await controller.signUp(args);
-    context.res.cookie(cookieKeys.token, result.token);
-    return result;
+    try{
+      const result = await controller.signUp(args);
+      context.res.cookie(cookieKeys.token, result.token);
+      return result;
+    }
+    catch(e){
+      console.error(e);
+      return {
+        status: 500,
+        error: "internal server error"
+      };
+    }
   }
 };
 
@@ -34,9 +43,18 @@ module.exports.signIn = {
   },
   type:    UserType,
   resolve: async (root, args, context) => {
-    const result = await controller.signIn(args);
-    context.res.cookie(cookieKeys.token, result.token);
-    return result;
+    try{
+      const result = await controller.signIn(args);
+      context.res.cookie(cookieKeys.token, result.token);
+      return result;
+    }
+    catch(e){
+      console.error(e);
+      return {
+        status: 500,
+        error: "internal server error"
+      };
+    }
   }
 };
 
@@ -67,13 +85,22 @@ module.exports.signInWithGoogle = {
   },
   type:    UserType,
   resolve: async (root, args, context) => {
-    const { token } = args;
-    const result = await controller.signInWithGoogle(
-      () => googleAuthVerify(token),
-      "google_id"
-    );
-    context.res.cookie(cookieKeys.token, result.token);
-    return result;
+    try{
+      const { token } = args;
+      const result = await controller.signInWithGoogle(
+        () => googleAuthVerify(token),
+        "google_id"
+      );
+      context.res.cookie(cookieKeys.token, result.token);
+      return result;
+    }
+    catch(e){
+      console.error(e);
+      return {
+        status: 500,
+        error: "internal server error"
+      };
+    }
   }
 };
 
@@ -82,8 +109,17 @@ module.exports.signOut = {
   description: "sign out!",
   type:        GraphQLString,
   resolve:     async (root, args, context) => {
-    const result = await controller.signOut(args);
-    context.res.clearCookie(cookieKeys.token);
-    return result.message;
+    try{
+      const result = await controller.signOut(args);
+      context.res.clearCookie(cookieKeys.token);
+      return result.message;
+    }
+    catch(e){
+      console.error(e);
+      return {
+        status: 500,
+        error: "internal server error"
+      };
+    }
   }
 };

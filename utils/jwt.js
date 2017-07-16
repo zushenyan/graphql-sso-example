@@ -11,7 +11,15 @@ module.exports.createJWT = (id, payload = {}) => jwt.sign(
   }
 );
 
-module.exports.verifyJWT = (token) => jwt.verify(token, jwtConfig.secret);
+module.exports.verifyJWT = (token) => {
+  try{
+    const result = jwt.verify(token, jwtConfig.secret);
+    return result;
+  }
+  catch(e){
+    return { error: e.message };
+  }
+};
 
 module.exports.getJWT = (req) => {
   const authorizationHeader = req.get("Authorization") || "";

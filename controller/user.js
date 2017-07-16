@@ -19,12 +19,19 @@ const getAllUsers = async () => {
 };
 
 const getCurrentUser = async ({ jwt }) => {
-  const { sub: id } = verifyJWT(jwt);
-  const user        = await userModel.find({ id }).first();
+  const result = verifyJWT(jwt);
+  if(result.error){
+    return {
+      status: 400,
+      error:  result.error
+    };
+  }
+  const { sub: id } = result;
+  const user = await userModel.find({ id }).first();
   if(!user){
     return {
       status:  404,
-      message: `user ${id} not found`
+      error: `user ${id} not found`
     };
   }
   return generatePublicUserInfo(user);
@@ -43,7 +50,7 @@ const signUp = async ({ email, password, confirmPassword }) => {
   if(password.trim() !== confirmPassword.trim()) {
     return {
       status:  400,
-      message: `passwords don't match!`
+      error: `passwords don't match!`
     }
   };
   const user  = (await userModel.create({ email, password }))[0];
@@ -55,7 +62,7 @@ const signIn = async ({ email, password }) => {
   if(!user){
     return {
       status:  401,
-      message: `Invalid email or password`
+      error: `Invalid email or password`
     };
   }
   return Object.assign({}, generatePublicUserInfo(user), { token: createJWT(user.id) });

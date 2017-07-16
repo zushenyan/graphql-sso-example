@@ -17,5 +17,7 @@ module.exports = new GraphQLObjectType({
     google_id:   { type: GraphQLString },
     created_at:  { type: GraphQLString },
     updated_at:  { type: GraphQLString },
+    error:       { type: GraphQLString },
+    status:      { type: GraphQLString },
   })
 });

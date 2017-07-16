@@ -18,7 +18,13 @@ describe("utils/jwt.js", () => {
       const id      = 123;
       const payload = { foo: "bar" };
       const token   = createJWT(id, payload);
-      expect(() => verifyJWT(token)).not.toThrow();
+      const result  = verifyJWT(token);
+      expect(result).toBeDefined();
+    });
+
+    it("invalid token", () => {
+      const result = verifyJWT("not a token");
+      expect(result).toHaveProperty("error");
     });
   });
 
