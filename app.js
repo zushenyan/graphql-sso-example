@@ -1,6 +1,7 @@
 const path         = require("path");
 const express      = require("express");
 const morgan       = require("morgan");
+const cors         = require("cors");
 const cookieParser = require("cookie-parser");
 const graphqlHTTP  = require("express-graphql");
 const schema       = require("./api/graphql");
@@ -26,6 +27,7 @@ const graphqlAPI =
 const app =
   express()
     .use(morgan("combined"))
+    .use(cors())
     .use(cookieParser())
     .use(graphqlAPI)
     .use(sitePage)

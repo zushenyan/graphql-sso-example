@@ -3,6 +3,10 @@ const {
   createJWT,
   verifyJWT
 } = require("utils/jwt.js");
+const {
+  buildError,
+  buildMessage
+} = require("utils/http-status-builder");
 
 const generatePublicUserInfo = (user) => ({
   id:          user.id,
@@ -20,20 +24,10 @@ const getAllUsers = async () => {
 
 const getCurrentUser = async ({ jwt }) => {
   const result = verifyJWT(jwt);
-  if(result.error){
-    return {
-      status: 400,
-      error:  result.error
-    };
-  }
+  if(result.error) return buildError(400, result.error);
   const { sub: id } = result;
   const user = await userModel.find({ id }).first();
-  if(!user){
-    return {
-      status:  404,
-      error: `user ${id} not found`
-    };
-  }
+  if(!user) return buildError(400, `user ${id} not found`);
   return generatePublicUserInfo(user);
 };
 
@@ -47,24 +41,14 @@ const updateUser = async ({ token, newData }) => {
 };
 
 const signUp = async ({ email, password, confirmPassword }) => {
-  if(password.trim() !== confirmPassword.trim()) {
-    return {
-      status:  400,
-      error: `passwords don't match!`
-    }
-  };
+  if(password.trim() !== confirmPassword.trim()) return buildError(400, `passwords don't match!`);
   const user  = (await userModel.create({ email, password }))[0];
   return Object.assign({}, generatePublicUserInfo(user), { token: createJWT(user.id) });
 };
 
 const signIn = async ({ email, password }) => {
   const user = await userModel.find({ email, password }).first();
-  if(!user){
-    return {
-      status:  401,
-      error: `Invalid email or password`
-    };
-  }
+  if(!user) return buildError(401, `invalid email or password`);
   return Object.assign({}, generatePublicUserInfo(user), { token: createJWT(user.id) });
 };
 
@@ -79,11 +63,7 @@ const signInWithSSO = async (vendorVerification, idColumnName) => {
   return Object.assign({}, generatePublicUserInfo(updatedUser), { token: createJWT(updatedUser.id) });
 };
 
-const signOut = () => {
-  return {
-    message: "sign out successfuly"
-  };
-};
+const signOut = () => buildMessage(200, `sign out successfully`);
 
 module.exports = {
   generatePublicUserInfo,

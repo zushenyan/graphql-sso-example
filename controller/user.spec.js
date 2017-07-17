@@ -225,7 +225,9 @@ describe("controller/user.js", () => {
 
   describe("signOut", () => {
     it("should work", () => {
-      expect(userController.signOut()).toBeDefined();
+      const result = userController.signOut();
+      expect(result).toHaveProperty("status");
+      expect(result).toHaveProperty("message");
     });
   });
 });

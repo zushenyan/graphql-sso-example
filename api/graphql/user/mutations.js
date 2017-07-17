@@ -2,12 +2,13 @@ const {
   GraphQLString,
   GraphQLID,
   GraphQLNonNull
-}                        = require("graphql");
-const UserType           = require("./types.js");
-const controller         = require("controller/user.js");
-const cookieKeys         = require("config/cookie-keys.js");
-const facebookAuthVerify = require("utils/facebook-auth/auth.js");
-const googleAuthVerify   = require("utils/google-auth/auth.js");
+}                           = require("graphql");
+const UserType              = require("./types.js");
+const controller            = require("controller/user.js");
+const cookieKeys            = require("config/cookie-keys.js");
+const facebookAuthVerify    = require("utils/facebook-auth/auth.js");
+const googleAuthVerify      = require("utils/google-auth/auth.js");
+const graphqlRequestHandler = require("utils/graphql-request-handler.js");
 
 module.exports.signUp = {
   name:        "signUp",
@@ -18,20 +19,12 @@ module.exports.signUp = {
     confirmPassword: { type: new GraphQLNonNull(GraphQLString) }
   },
   type:    UserType,
-  resolve: async (root, args, context) => {
-    try{
+  resolve: (root, args, context) =>
+    graphqlRequestHandler(async () => {
       const result = await controller.signUp(args);
       context.res.cookie(cookieKeys.token, result.token);
       return result;
-    }
-    catch(e){
-      console.error(e);
-      return {
-        status: 500,
-        error: "internal server error"
-      };
-    }
-  }
+    })
 };
 
 module.exports.signIn = {
@@ -42,20 +35,12 @@ module.exports.signIn = {
     password: { type: new GraphQLNonNull(GraphQLString) }
   },
   type:    UserType,
-  resolve: async (root, args, context) => {
-    try{
+  resolve: (root, args, context) =>
+    graphqlRequestHandler(async () => {
       const result = await controller.signIn(args);
       context.res.cookie(cookieKeys.token, result.token);
       return result;
-    }
-    catch(e){
-      console.error(e);
-      return {
-        status: 500,
-        error: "internal server error"
-      };
-    }
-  }
+    })
 };
 
 module.exports.signInWithFacebook = {
@@ -66,15 +51,16 @@ module.exports.signInWithFacebook = {
     accessToken: { type: new GraphQLNonNull(GraphQLString) }
   },
   type:    UserType,
-  resolve: async (root, args, context) => {
-    const { userId, accessToken } = args;
-    const result = await controller.signInWithFacebook(
-      () => facebookAuthVerify(userId, accessToken),
-      "facebook_id"
-    );
-    context.res.cookie(cookieKeys.token, result.token);
-    return result;
-  }
+  resolve: (root, args, context) =>
+    graphqlRequestHandler(async () => {
+      const { userId, accessToken } = args;
+      const result = await controller.signInWithFacebook(
+        () => facebookAuthVerify(userId, accessToken),
+        "facebook_id"
+      );
+      context.res.cookie(cookieKeys.token, result.token);
+      return result;
+    })
 };
 
 module.exports.signInWithGoogle = {
@@ -84,8 +70,8 @@ module.exports.signInWithGoogle = {
     token: { type: new GraphQLNonNull(GraphQLString) },
   },
   type:    UserType,
-  resolve: async (root, args, context) => {
-    try{
+  resolve: (root, args, context) =>
+    graphqlRequestHandler(async () => {
       const { token } = args;
       const result = await controller.signInWithGoogle(
         () => googleAuthVerify(token),
@@ -93,33 +79,17 @@ module.exports.signInWithGoogle = {
       );
       context.res.cookie(cookieKeys.token, result.token);
       return result;
-    }
-    catch(e){
-      console.error(e);
-      return {
-        status: 500,
-        error: "internal server error"
-      };
-    }
-  }
+    })
 };
 
 module.exports.signOut = {
   name:        "signOut",
   description: "sign out!",
   type:        GraphQLString,
-  resolve:     async (root, args, context) => {
-    try{
+  resolve:     (root, args, context) =>
+    graphqlRequestHandler(async () => {
       const result = await controller.signOut(args);
       context.res.clearCookie(cookieKeys.token);
       return result.message;
-    }
-    catch(e){
-      console.error(e);
-      return {
-        status: 500,
-        error: "internal server error"
-      };
-    }
-  }
+    })
 };
