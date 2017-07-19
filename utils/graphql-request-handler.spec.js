@@ -9,8 +9,8 @@ describe("", () => {
     });
 
     it("should throw", async () => {
-      const fn = async () => await Promise.rejects("Q_Q");
-      await expect(graphqlRequestHandler(fn)).rejects.toBeDefined();
+      const fn = async () => await Promise.reject("Q_Q");
+      await expect(graphqlRequestHandler(fn)).resolves.toHaveProperty("error");
     });
   });
 });

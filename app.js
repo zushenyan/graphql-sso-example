@@ -5,7 +5,6 @@ const cors         = require("cors");
 const cookieParser = require("cookie-parser");
 const graphqlHTTP  = require("express-graphql");
 const schema       = require("./api/graphql");
-const config       = require("./config/server.js");
 
 const sitePage =
   express()
@@ -24,13 +23,10 @@ const graphqlAPI =
       context: { req, res }
     })));
 
-const app =
+module.exports =
   express()
     .use(morgan("combined"))
     .use(cors())
     .use(cookieParser())
     .use(graphqlAPI)
-    .use(sitePage)
-    .listen(config.port, () => {
-      console.log(`server is running on port ${config.port}...`);
-    });
+    .use(sitePage);

@@ -12,18 +12,16 @@ module.exports.getAllUsers = {
   name:        "getAllUsers",
   description: "get all users!",
   type:        new GraphQLList(UserType),
-  resolve:     (root, args, context) =>
-    graphqlRequestHandler(async () => {
-      return await controller.getAllUsers(args);
-    })
+  resolve:     async (root, args, context) =>
+    await controller.getAllUsers(args)
 };
 
 module.exports.getCurrentUser = {
   name:        "getCurrentUser",
   description: "get current user!",
   type:        UserType,
-  resolve:     (root, args, context) =>
-    graphqlRequestHandler(async () => {
+  resolve:     async (root, args, context) =>
+    await graphqlRequestHandler(async () => {
       const { req } = context;
       const jwt = getJWT(req);
       return await controller.getCurrentUser({ jwt });

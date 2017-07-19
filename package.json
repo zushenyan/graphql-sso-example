@@ -12,10 +12,8 @@
     "cors": "^2.8.4",
     "express": "^4.15.3",
     "express-graphql": "^0.6.6",
-    "faker": "^4.1.0",
     "google-auth-library": "^0.10.0",
     "graphql": "^0.10.1",
-    "jest": "^20.0.4",
     "jsonwebtoken": "^7.4.1",
     "knex": "^0.13.0",
     "lodash": "^4.17.4",
@@ -23,10 +21,14 @@
     "pg": "^6.4.0"
   },
   "devDependencies": {
-    "nodemon": "^1.11.0"
+    "faker": "^4.1.0",
+    "jest": "^20.0.4",
+    "moxios": "^0.4.0",
+    "nodemon": "^1.11.0",
+    "supertest": "^3.0.0"
   },
   "scripts": {
-    "dev": "NODE_ENV=development NODE_PATH=. nodemon app.js",
+    "dev": "NODE_ENV=development NODE_PATH=. nodemon boot.js",
     "test": "NODE_ENV=test NODE_PATH=. jest --watch",
     "nodemon": "nodemon",
     "knex": "knex"

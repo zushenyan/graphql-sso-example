@@ -18,8 +18,9 @@ const generatePublicUserInfo = (user) => ({
 });
 
 const getAllUsers = async () => {
-  const users = await userModel.getAll();
-  return users.map(generatePublicUserInfo);
+  const users  = await userModel.getAll();
+  const result = users.map(generatePublicUserInfo);
+  return Object.assign({}, { users: result }, buildMessage(200, "done"));
 };
 
 const getCurrentUser = async ({ jwt }) => {

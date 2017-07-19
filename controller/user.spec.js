@@ -45,7 +45,8 @@ describe("controller/user.js", () => {
       const users1   = await knex("users").select();
       const users2   = await userController.getAllUsers();
       const expected = users1.map(userController.generatePublicUserInfo);
-      expect(users2).toEqual(expected);
+      expect(users2.users).toEqual(expected);
+      expect(users2.status).toEqual(200);
     });
   });
 

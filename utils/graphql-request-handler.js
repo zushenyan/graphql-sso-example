@@ -1,8 +1,8 @@
 const { createInternalError } = require("utils/http-status-builder.js");
 
-module.exports = (fn) => {
+module.exports = async (fn) => {
   try {
-    return fn();
+    return await fn();
   }
   catch(e){
     console.error(e);

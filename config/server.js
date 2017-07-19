@@ -1,3 +1,14 @@
+const protocol = "http";
+
+const domain = "localhost";
+
+const port = 8888;
+
+const url = `${protocol}://${domain}:${port}`;
+
 module.exports = {
-  port: 8888
+  protocol,
+  domain,
+  port,
+  url
 };
