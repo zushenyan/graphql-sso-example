@@ -1,0 +1,13 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`models/user.js create should throw error when trying to create a row with duplciated unique columns 1`] = `[error: insert into "users" ("email", "password") values ($1, $2) returning * - duplicate key value violates unique constraint "users_email_unique"]`;
+
+exports[`models/user.js create should throw error when trying to create a row with duplciated unique columns 2`] = `[error: insert into "users" ("email", "facebook_id", "password") values ($1, $2, $3) returning * - duplicate key value violates unique constraint "users_facebook_id_unique"]`;
+
+exports[`models/user.js create should throw error when trying to create a row with duplciated unique columns 3`] = `[error: insert into "users" ("email", "google_id", "password") values ($1, $2, $3) returning * - duplicate key value violates unique constraint "users_google_id_unique"]`;
+
+exports[`models/user.js create should throw error with absent of options 1`] = `[error: insert into "users" ("password") values ($1) returning * - null value in column "email" violates not-null constraint]`;
+
+exports[`models/user.js create should throw error with absent of options 2`] = `[error: insert into "users" ("email") values ($1) returning * - null value in column "password" violates not-null constraint]`;
+
+exports[`models/user.js update should throw error when assigning already exist email 1`] = `[error: update "users" set "email" = $1, "updated_at" = CURRENT_TIMESTAMP where "id" = $2 returning * - duplicate key value violates unique constraint "users_email_unique"]`;

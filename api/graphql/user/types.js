@@ -1,23 +1,59 @@
+const { fields: ResponseFields } = require("api/graphql/response/types.js");
 const {
   GraphQLObjectType,
-  GraphQLUnionType,
+  GraphQLInputObjectType,
   GraphQLID,
   GraphQLString,
-  GraphQLBoolean,
+  GraphQLList
 } = require("graphql");
 
-module.exports = new GraphQLObjectType({
+const fields = {
+  id:          { type: GraphQLID },
+  email:       { type: GraphQLString },
+  token:       { type: GraphQLString },
+  facebook_id: { type: GraphQLString },
+  google_id:   { type: GraphQLString },
+  created_at:  { type: GraphQLString },
+  updated_at:  { type: GraphQLString },
+};
+
+const inputFields = {
+  email: { type: GraphQLString }
+};
+
+const UserTypeHelper = new GraphQLObjectType({
+  name:        "UserHelper",
+  description: "user type helper!",
+  fields:      () => fields
+});
+
+const UserType = new GraphQLObjectType({
   name:        "User",
   description: "user type!",
-  fields:      () => ({
-    id:          { type: GraphQLID },
-    email:       { type: GraphQLString },
-    token:       { type: GraphQLString },
-    facebook_id: { type: GraphQLString },
-    google_id:   { type: GraphQLString },
-    created_at:  { type: GraphQLString },
-    updated_at:  { type: GraphQLString },
-    error:       { type: GraphQLString },
-    status:      { type: GraphQLString },
-  })
+  fields:      () => Object.assign({}, fields, ResponseFields)
 });
+
+const UserListType = new GraphQLObjectType({
+  name:        "UserList",
+  description: "user list type!",
+  fields:      () => Object.assign({},
+    {
+      users: { type: new GraphQLList(UserTypeHelper) }
+    },
+    ResponseFields
+  )
+});
+
+const UserInputType = new GraphQLInputObjectType({
+  name:        "UserInput",
+  description: "user input type!",
+  fields:      inputFields
+});
+
+module.exports = {
+  UserTypeHelper,
+  fields,
+  UserType,
+  UserListType,
+  UserInputType
+};

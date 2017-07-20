@@ -1,0 +1,15 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[` createInternalError should work 1`] = `
+Object {
+  "message": "internal server error",
+  "status": 500,
+}
+`;
+
+exports[` createOk should work 1`] = `
+Object {
+  "message": "ok",
+  "status": 123,
+}
+`;

@@ -1,20 +1,20 @@
-const buildError = (status, error) => ({
-  status,
-  error
-});
-
 const buildMessage = (status, message) => ({
   status,
   message
 });
 
-const createInternalError = () => buildError(
+const createInternalError = () => buildMessage(
   500,
   "internal server error"
 );
 
+const createOk = (status) => buildMessage(
+  status,
+  "ok"
+);
+
 module.exports = {
-  buildError,
   buildMessage,
-  createInternalError
+  createInternalError,
+  createOk
 };

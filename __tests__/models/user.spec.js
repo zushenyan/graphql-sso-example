@@ -1,5 +1,5 @@
 const knex      = require("db/knex.js");
-const userModel = require("./user.js");
+const userModel = require("models/user.js");
 
 describe("models/user.js", () => {
   beforeAll(async () => {
@@ -41,8 +41,8 @@ describe("models/user.js", () => {
     });
 
     it("should throw error with absent of options", async () => {
-      await expect(userModel.create({ password: "1234" })).rejects.toBeDefined();
-      await expect(userModel.create({ email: "hahaha@test.com" })).rejects.toBeDefined();
+      await expect(userModel.create({ password: "1234" })).rejects.toMatchSnapshot();
+      await expect(userModel.create({ email: "hahaha@test.com" })).rejects.toMatchSnapshot();
     });
 
     it("should throw error when trying to create a row with duplciated unique columns", async () => {
@@ -51,9 +51,9 @@ describe("models/user.js", () => {
       const query       = { id: 1 };
       const data        = await knex("users").where("id", 1).first();
       await knex("users").where(query).update({ facebook_id, google_id });
-      await expect(userModel.create({ email: data.email, password: "123456" })).rejects.toBeDefined();
-      await expect(userModel.create({ email: "foo@test.com", password: "123456", facebook_id })).rejects.toBeDefined();
-      await expect(userModel.create({ email: "bar@test.com", password: "123456", google_id })).rejects.toBeDefined();
+      await expect(userModel.create({ email: data.email, password: "123456" })).rejects.toMatchSnapshot();
+      await expect(userModel.create({ email: "foo@test.com", password: "123456", facebook_id })).rejects.toMatchSnapshot();
+      await expect(userModel.create({ email: "bar@test.com", password: "123456", google_id })).rejects.toMatchSnapshot();
     });
   });
 
@@ -78,7 +78,7 @@ describe("models/user.js", () => {
       const query1 = { id: 1 };
       const query2 = { id: 2 };
       const data1 = await knex("users").where(query1).first();
-      await expect(userModel.update(query2, { email: data1.email })).rejects.toBeDefined();
+      await expect(userModel.update(query2, { email: data1.email })).rejects.toMatchSnapshot();
     });
   });
 });

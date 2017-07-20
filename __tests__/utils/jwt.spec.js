@@ -2,7 +2,7 @@ const {
   createJWT,
   verifyJWT,
   getJWT
-} = require("./jwt.js");
+} = require("utils/jwt.js");
 
 describe("utils/jwt.js", () => {
   describe("createJWT", () => {
@@ -15,16 +15,19 @@ describe("utils/jwt.js", () => {
 
   describe("verifyJWT", () => {
     it("should verify JWT ", () => {
-      const id      = 123;
+      const id      = "123";
       const payload = { foo: "bar" };
       const token   = createJWT(id, payload);
       const result  = verifyJWT(token);
-      expect(result).toBeDefined();
+      expect(result).toMatchObject(Object.assign(
+        { sub: id },
+        payload
+      ));
     });
 
     it("invalid token", () => {
       const result = verifyJWT("not a token");
-      expect(result).toHaveProperty("error");
+      expect(result).toMatchSnapshot();
     });
   });
 

@@ -1,0 +1,62 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`controller/user.js generatePublicUserInfo should work 1`] = `
+Object {
+  "created_at": "created_at",
+  "email": "ggyy@test.com",
+  "facebook_id": "facebookoooo",
+  "google_id": "googleoooo",
+  "id": 123,
+  "updated_at": "updated_at",
+}
+`;
+
+exports[`controller/user.js getCurrentUser should response 404 when id is not found 1`] = `
+Object {
+  "message": "user 6 not found",
+  "status": 400,
+}
+`;
+
+exports[`controller/user.js getCurrentUser should throw error when token is invalid 1`] = `
+Object {
+  "message": "invalid token",
+  "status": 400,
+}
+`;
+
+exports[`controller/user.js signIn should not let user sign in when input wrong credential 1`] = `
+Object {
+  "message": "invalid email or password",
+  "status": 401,
+}
+`;
+
+exports[`controller/user.js signIn should not let user sign in when input wrong credential 2`] = `
+Object {
+  "message": "invalid email or password",
+  "status": 401,
+}
+`;
+
+exports[`controller/user.js signOut should work 1`] = `[Error: Undefined binding(s) detected when compiling FIRST query: select * from "users" where "facebook_id" = ? limit ?]`;
+
+exports[`controller/user.js signOut should work 2`] = `[error: select * from "users" where "no_such_column" = $1 limit $2 - column "no_such_column" does not exist]`;
+
+exports[`controller/user.js signOut should work 3`] = `
+Object {
+  "message": "ok",
+  "status": 200,
+}
+`;
+
+exports[`controller/user.js signUp should fail when email already exists 1`] = `[error: insert into "users" ("email", "password") values ($1, $2) returning * - duplicate key value violates unique constraint "users_email_unique"]`;
+
+exports[`controller/user.js updateUser should fail when trying to set email owned by other user for current user 1`] = `[error: update "users" set "email" = $1, "updated_at" = CURRENT_TIMESTAMP where "id" = $2 returning * - duplicate key value violates unique constraint "users_email_unique"]`;
+
+exports[`status 1`] = `
+Object {
+  "message": "passwords don't match!",
+  "status": 400,
+}
+`;

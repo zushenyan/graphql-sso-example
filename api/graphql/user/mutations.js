@@ -3,12 +3,17 @@ const {
   GraphQLID,
   GraphQLNonNull
 }                           = require("graphql");
-const UserType              = require("./types.js");
+const { ResponseType }      = require("api/graphql/response/types.js");
 const controller            = require("controller/user.js");
 const cookieKeys            = require("config/cookie-keys.js");
 const facebookAuthVerify    = require("utils/facebook-auth/auth.js");
 const googleAuthVerify      = require("utils/google-auth/auth.js");
 const graphqlRequestHandler = require("utils/graphql-request-handler.js");
+const { getJWT }            = require("utils/jwt.js");
+const {
+  UserType,
+  UserInputType
+} = require("./types.js");
 
 module.exports.signUp = {
   name:        "signUp",
@@ -19,8 +24,8 @@ module.exports.signUp = {
     confirmPassword: { type: new GraphQLNonNull(GraphQLString) }
   },
   type:    UserType,
-  resolve: (root, args, context) =>
-    graphqlRequestHandler(async () => {
+  resolve: async (root, args, context) =>
+    await graphqlRequestHandler(async () => {
       const result = await controller.signUp(args);
       context.res.cookie(cookieKeys.token, result.token);
       return result;
@@ -35,8 +40,8 @@ module.exports.signIn = {
     password: { type: new GraphQLNonNull(GraphQLString) }
   },
   type:    UserType,
-  resolve: (root, args, context) =>
-    graphqlRequestHandler(async () => {
+  resolve: async (root, args, context) =>
+    await graphqlRequestHandler(async () => {
       const result = await controller.signIn(args);
       context.res.cookie(cookieKeys.token, result.token);
       return result;
@@ -51,8 +56,8 @@ module.exports.signInWithFacebook = {
     accessToken: { type: new GraphQLNonNull(GraphQLString) }
   },
   type:    UserType,
-  resolve: (root, args, context) =>
-    graphqlRequestHandler(async () => {
+  resolve: async (root, args, context) =>
+    await graphqlRequestHandler(async () => {
       const { userId, accessToken } = args;
       const result = await controller.signInWithFacebook(
         () => facebookAuthVerify(userId, accessToken),
@@ -70,8 +75,8 @@ module.exports.signInWithGoogle = {
     token: { type: new GraphQLNonNull(GraphQLString) },
   },
   type:    UserType,
-  resolve: (root, args, context) =>
-    graphqlRequestHandler(async () => {
+  resolve: async (root, args, context) =>
+    await graphqlRequestHandler(async () => {
       const { token } = args;
       const result = await controller.signInWithGoogle(
         () => googleAuthVerify(token),
@@ -82,14 +87,35 @@ module.exports.signInWithGoogle = {
     })
 };
 
+module.exports.updateUser = {
+  name:        "updateUser",
+  description: "update User!",
+  args: {
+    data: {
+      type:        UserInputType,
+      description: "JSON in string"
+    }
+  },
+  type:        UserType,
+  resolve:     async (root, args, context) =>
+    await graphqlRequestHandler(async () => {
+      const { req }  = context;
+      const jwt      = getJWT(req);
+      const { data } = args;
+      const result   = await controller.updateUser({ jwt, data });
+      context.res.cookie(cookieKeys.token, result.token);
+      return result;
+    })
+};
+
 module.exports.signOut = {
   name:        "signOut",
   description: "sign out!",
-  type:        GraphQLString,
-  resolve:     (root, args, context) =>
-    graphqlRequestHandler(async () => {
+  type:        ResponseType,
+  resolve:     async (root, args, context) =>
+    await graphqlRequestHandler(async () => {
       const result = await controller.signOut(args);
       context.res.clearCookie(cookieKeys.token);
-      return result.message;
+      return result;
     })
 };

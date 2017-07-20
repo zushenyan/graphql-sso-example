@@ -4,8 +4,8 @@ const {
   verifyJWT
 } = require("utils/jwt.js");
 const {
-  buildError,
-  buildMessage
+  buildMessage,
+  createOk
 } = require("utils/http-status-builder");
 
 const generatePublicUserInfo = (user) => ({
@@ -20,37 +20,55 @@ const generatePublicUserInfo = (user) => ({
 const getAllUsers = async () => {
   const users  = await userModel.getAll();
   const result = users.map(generatePublicUserInfo);
-  return Object.assign({}, { users: result }, buildMessage(200, "done"));
+  return Object.assign(
+    { users: result },
+    createOk(200)
+  );
 };
 
 const getCurrentUser = async ({ jwt }) => {
   const result = verifyJWT(jwt);
-  if(result.error) return buildError(400, result.error);
+  if(result.error) return buildMessage(400, result.error);
   const { sub: id } = result;
   const user = await userModel.find({ id }).first();
-  if(!user) return buildError(400, `user ${id} not found`);
-  return generatePublicUserInfo(user);
+  if(!user) return buildMessage(400, `user ${id} not found`);
+  return Object.assign(
+    generatePublicUserInfo(user),
+    createOk(200)
+  );
 };
 
-const updateUser = async ({ token, newData }) => {
-  delete newData.id;
-  delete newData.created_at;
-  delete newData.updated_at;
-  const { sub: id } = verifyJWT(token);
-  const user = (await userModel.update({ id }, newData))[0];
-  return generatePublicUserInfo(user);
+const updateUser = async ({ jwt, data }) => {
+  if(data.id)         delete data.id;
+  if(data.created_at) delete data.created_at;
+  if(data.updated_at) delete data.updated_at;
+  const { sub: id } = verifyJWT(jwt);
+  const user = (await userModel.update({ id }, data))[0];
+  return Object.assign(
+    { token: createJWT(user.id) },
+    generatePublicUserInfo(user),
+    createOk(200)
+  );
 };
 
 const signUp = async ({ email, password, confirmPassword }) => {
-  if(password.trim() !== confirmPassword.trim()) return buildError(400, `passwords don't match!`);
+  if(password.trim() !== confirmPassword.trim()) return buildMessage(400, `passwords don't match!`);
   const user  = (await userModel.create({ email, password }))[0];
-  return Object.assign({}, generatePublicUserInfo(user), { token: createJWT(user.id) });
+  return Object.assign(
+    { token: createJWT(user.id) },
+    generatePublicUserInfo(user),
+    createOk(200)
+  );
 };
 
 const signIn = async ({ email, password }) => {
   const user = await userModel.find({ email, password }).first();
-  if(!user) return buildError(401, `invalid email or password`);
-  return Object.assign({}, generatePublicUserInfo(user), { token: createJWT(user.id) });
+  if(!user) return buildMessage(401, `invalid email or password`);
+  return Object.assign(
+    { token: createJWT(user.id) },
+    generatePublicUserInfo(user),
+    createOk(200)
+  );
 };
 
 const signInWithSSO = async (vendorVerification, idColumnName) => {
@@ -61,10 +79,14 @@ const signInWithSSO = async (vendorVerification, idColumnName) => {
     await userModel.update({ id: existUser.id }, { [idColumnName]: id }) :
     await userModel.create({ email, password: "whatever", [idColumnName]: id })
   )[0];
-  return Object.assign({}, generatePublicUserInfo(updatedUser), { token: createJWT(updatedUser.id) });
+  return Object.assign(
+    { token: createJWT(updatedUser.id) },
+    generatePublicUserInfo(updatedUser),
+    createOk(200)
+  );
 };
 
-const signOut = () => buildMessage(200, `sign out successfully`);
+const signOut = () => createOk(200);
 
 module.exports = {
   generatePublicUserInfo,

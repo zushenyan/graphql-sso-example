@@ -1,0 +1,10 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[` request handler should throw 1`] = `
+Object {
+  "message": "internal server error",
+  "status": 500,
+}
+`;
+
+exports[` request handler should work 1`] = `42`;

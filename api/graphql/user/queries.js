@@ -1,19 +1,19 @@
-const {
-  GraphQLID,
-  GraphQLNonNull,
-  GraphQLList
-}                           = require("graphql");
-const UserType              = require("./types.js");
 const controller            = require("controller/user.js");
 const { getJWT }            = require("utils/jwt.js");
 const graphqlRequestHandler = require("utils/graphql-request-handler.js");
+const {
+  UserType,
+  UserListType
+}                           = require("./types.js");
 
 module.exports.getAllUsers = {
   name:        "getAllUsers",
   description: "get all users!",
-  type:        new GraphQLList(UserType),
+  type:        UserListType,
   resolve:     async (root, args, context) =>
-    await controller.getAllUsers(args)
+    await graphqlRequestHandler(async () => {
+      return await controller.getAllUsers(args);
+    })
 };
 
 module.exports.getCurrentUser = {

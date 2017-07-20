@@ -1,5 +1,5 @@
 const knex      = require("db/knex.js");
-const postModel = require("./post.js");
+const postModel = require("models/post.js");
 
 describe("models/post.js", () => {
   beforeAll(async () => {
@@ -41,7 +41,7 @@ describe("models/post.js", () => {
     });
 
     it("should throw error with absent of options", async () => {
-      await expect(postModel.create({ content: "kkkkk" })).rejects.toBeDefined();
+      await expect(postModel.create({ content: "kkkkk" })).rejects.toMatchSnapshot();
     });
   });
 
