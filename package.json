@@ -14,11 +14,14 @@
     "express-graphql": "^0.6.6",
     "google-auth-library": "^0.10.0",
     "graphql": "^0.10.1",
+    "helmet": "^3.8.0",
     "jsonwebtoken": "^7.4.1",
     "knex": "^0.13.0",
     "lodash": "^4.17.4",
     "morgan": "^1.8.2",
-    "pg": "^6.4.0"
+    "pg": "^6.4.0",
+    "winston": "^2.3.1",
+    "winston-daily-rotate-file": "^1.4.6"
   },
   "devDependencies": {
     "faker": "^4.1.0",
