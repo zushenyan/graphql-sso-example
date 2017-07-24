@@ -1,5 +1,6 @@
-const faker = require("faker");
-const _     = require("lodash");
+const faker            = require("faker");
+const _                = require("lodash");
+const { genHashSync } = require("utils/password.js");
 
 faker.seed(123);
 faker.locale = "en_US";
@@ -7,7 +8,7 @@ faker.locale = "en_US";
 const users = _.range(5).map((val, index) => ({
   id:       index + 1,
   email:    faker.internet.email(),
-  password: faker.internet.password()
+  password: genHashSync(faker.internet.password())
 }));
 
 const posts = _.range(10).map((val, index) => {

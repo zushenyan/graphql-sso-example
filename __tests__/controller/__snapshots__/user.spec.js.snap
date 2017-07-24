@@ -52,11 +52,18 @@ Object {
 
 exports[`controller/user.js signUp should fail when email already exists 1`] = `[error: insert into "users" ("email", "password") values ($1, $2) returning * - duplicate key value violates unique constraint "users_email_unique"]`;
 
-exports[`controller/user.js updateUser should fail when trying to set email owned by other user for current user 1`] = `[error: update "users" set "email" = $1, "updated_at" = CURRENT_TIMESTAMP where "id" = $2 returning * - duplicate key value violates unique constraint "users_email_unique"]`;
-
-exports[`status 1`] = `
+exports[`controller/user.js signUp should fail when password doesn't match with confirmation password 1`] = `
 Object {
   "message": "passwords don't match!",
   "status": 400,
 }
 `;
+
+exports[`controller/user.js signUp should fail when password doesn't match with confirmation password 2`] = `
+Object {
+  "message": "password should be at least 8 characters",
+  "status": 400,
+}
+`;
+
+exports[`controller/user.js updateUser should fail when trying to set email owned by other user for current user 1`] = `[error: update "users" set "email" = $1, "updated_at" = CURRENT_TIMESTAMP where "id" = $2 returning * - duplicate key value violates unique constraint "users_email_unique"]`;

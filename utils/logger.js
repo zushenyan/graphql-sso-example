@@ -22,7 +22,9 @@ const consoleLogger = new winston.Logger({
       handleExceptions: true,
       json:             false,
       colorize:         true,
-      level:            "debug"
+      level:            process.env.NODE_ENV === "test"        ? "fatal" :
+                        process.env.NODE_ENV === "development" ? "debug" : 
+                                                                 "info"
     })
   ]
 });

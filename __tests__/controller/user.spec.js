@@ -86,27 +86,33 @@ describe("controller/user.js", () => {
     it("should sign up successfully", async () => {
       const data = {
         email:           "totally_new@test.com",
-        password:        "9999",
-        confirmPassword: "9999"
+        password:        "12345678",
+        confirmPassword: "12345678"
       };
       await expect(userController.signUp(data)).resolves.toBeDefined();
     });
 
     it("should fail when password doesn't match with confirmation password", async () => {
-      const data = {
+      const data1 = {
         email:           "totally_new@test.com",
         password:        "9999",
         confirmPassword: "8888"
       };
-      await expect(userController.signUp(data)).resolves.toMatchSnapshot("status");
+      const data2 = {
+        email:           "test@foobar.com",
+        password:        "1234567",
+        confirmPassword: "1234567"
+      };
+      await expect(userController.signUp(data1)).resolves.toMatchSnapshot();
+      await expect(userController.signUp(data2)).resolves.toMatchSnapshot();
     });
 
     it("should fail when email already exists", async () => {
       const user = await knex("users").where({ id: 1 }).first();
       const data = {
         email:           user.email,
-        password:        "9999",
-        confirmPassword: "9999"
+        password:        "12345678",
+        confirmPassword: "12345678"
       };
       await expect(userController.signUp(data)).rejects.toMatchSnapshot();
     });
