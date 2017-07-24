@@ -182,8 +182,8 @@ describe("", () => {
         const variables = `
           {
             "email": "newUser@test.com",
-            "password": "1234567",
-            "confirmPassword": "1234567"
+            "password": "12345678",
+            "confirmPassword": "12345678"
           }
         `;
         const query = `

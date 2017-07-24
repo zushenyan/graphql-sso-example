@@ -11,19 +11,10 @@ exports.up = async function(knex, Promise) {
       table.unique("email");
       table.unique("facebook_id");
       table.unique("google_id");
-    }),
-    knex.schema.createTableIfNotExists("posts", (table) => {
-      table.increments("id").primary();
-      table.integer("user_id").notNullable();
-      table.text("content");
-      table.timestamps(true, true);
-
-      table.foreign("user_id").references("users.id");
     })
   ]);
 };
 
 exports.down = async function(knex, Promise) {
-  await knex.schema.dropTableIfExists("posts");
   await knex.schema.dropTableIfExists("users");
 };

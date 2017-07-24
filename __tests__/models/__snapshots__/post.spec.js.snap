@@ -1,3 +1,0 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
-
-exports[`models/post.js create should throw error with absent of options 1`] = `[error: insert into "posts" ("content") values ($1) returning * - null value in column "user_id" violates not-null constraint]`;
