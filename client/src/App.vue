@@ -113,8 +113,10 @@ export default {
         password: ""
       },
       updateProfile: {
-        email: "",
-        about: ""
+        email:           "",
+        about:           "",
+        password:        "",
+        confirmPassword: ""
       }
     };
   },
@@ -124,8 +126,13 @@ export default {
     },
     updateCurrentUser(data){
       this.currentUser = data;
-      this.updateProfile.email = this.currentUser.email || "";
-      this.updateProfile.about = this.currentUser.about || "";
+      const {
+        email = "",
+        about = "",
+        password = "",
+        confirmPassword = ""
+      } = this.currentUser;
+      this.updateProfile = { email, about, password, confirmPassword };
     },
 
     getAllUsersMethod(){
