@@ -25,6 +25,7 @@ describe("controller/user.js", () => {
         google_id:   "googleoooo",
         created_at:  "created_at",
         updated_at:  "updated_at",
+        about:       "lalala",
         trash:       "i shouldn't be here",
         another_key: "aaaaa"
       };

@@ -1,7 +1,7 @@
 const {
   responseFormatter,
   errorFormatter
-} = require("./formatter.js");
+} = require("utils/google-auth/formatter.js");
 
 describe("formatter", () => {
   it("responseFormatter should work", () => {
