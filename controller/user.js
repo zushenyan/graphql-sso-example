@@ -16,6 +16,7 @@ const {
 const generatePublicUserInfo = (user) => ({
   id:          user.id,
   email:       user.email,
+  about:       user.about,
   facebook_id: user.facebook_id,
   google_id:   user.google_id,
   created_at:  user.created_at,

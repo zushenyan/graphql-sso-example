@@ -26,6 +26,7 @@ const fragmentUserType = `
     id
     email
     token
+    about
     facebook_id
     google_id
     created_at
@@ -41,6 +42,7 @@ const fragmentUserListType = `
       id
       email
       token
+      about
       facebook_id
       google_id
       created_at

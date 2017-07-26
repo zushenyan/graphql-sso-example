@@ -11,6 +11,7 @@ const fields = {
   id:          { type: GraphQLID },
   email:       { type: GraphQLString },
   token:       { type: GraphQLString },
+  about:       { type: GraphQLString },
   facebook_id: { type: GraphQLString },
   google_id:   { type: GraphQLString },
   created_at:  { type: GraphQLString },
@@ -18,7 +19,9 @@ const fields = {
 };
 
 const inputFields = {
-  email: { type: GraphQLString }
+  email:    { type: GraphQLString },
+  password: { type: GraphQLString },
+  about:    { type: GraphQLString },
 };
 
 const UserTypeHelper = new GraphQLObjectType({

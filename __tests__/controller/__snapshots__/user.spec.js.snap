@@ -2,6 +2,7 @@
 
 exports[`controller/user.js generatePublicUserInfo should work 1`] = `
 Object {
+  "about": "lalala",
   "created_at": "created_at",
   "email": "ggyy@test.com",
   "facebook_id": "facebookoooo",
