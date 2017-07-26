@@ -10,6 +10,7 @@ const {
 const {
   genHash,
   genHashSync,
+  compareHashSync,
   validatePassword
 } = require("utils/password.js");
 
@@ -48,7 +49,10 @@ const updateUser = async ({ jwt, data }) => {
   if(data.id)         delete data.id;
   if(data.created_at) delete data.created_at;
   if(data.updated_at) delete data.updated_at;
-  if(data.password) data.password = await genHash(data.password);
+  if(data.password) {
+    if(!validatePassword(data.password)) return buildMessage(400, `password should be at least 8 characters`)
+    data.password = await genHash(data.password)
+  };
   const { sub: id } = verifyJWT(jwt);
   const user = (await userModel.update({ id }, data))[0];
   return Object.assign(
@@ -60,7 +64,7 @@ const updateUser = async ({ jwt, data }) => {
 
 const signUp = async ({ email, password, confirmPassword }) => {
   if(password.trim() !== confirmPassword.trim()) return buildMessage(400, `passwords don't match!`);
-  if(!validatePassword(password)) return buildMessage(400, `password should be at least 8 characters`)
+  if(!validatePassword(password)) return buildMessage(400, `password should be at least 8 characters`);
   const hash = await genHash(password);
   const user = (await userModel.create({ email, password: hash }))[0];
   return Object.assign(
@@ -71,8 +75,10 @@ const signUp = async ({ email, password, confirmPassword }) => {
 };
 
 const signIn = async ({ email, password }) => {
-  const user = await userModel.find({ email, password }).first();
-  if(!user) return buildMessage(401, `invalid email or password`);
+  const user              = await userModel.find({ email }).first();
+  const hash              = user ? user.password : "";
+  const isPasswordCorrect = compareHashSync(password, hash);
+  if(!user || !isPasswordCorrect) return buildMessage(401, `invalid email or password`);
   return Object.assign(
     { token: createJWT(user.id) },
     generatePublicUserInfo(user),

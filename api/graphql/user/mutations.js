@@ -103,7 +103,7 @@ module.exports.updateUser = {
       const jwt      = getJWT(req);
       const { data } = args;
       const result   = await controller.updateUser({ jwt, data });
-      context.res.cookie(cookieKeys.token, result.token);
+      if(result.token) context.res.cookie(cookieKeys.token, result.token);
       return result;
     })
 };

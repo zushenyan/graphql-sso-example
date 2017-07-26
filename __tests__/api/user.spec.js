@@ -143,7 +143,7 @@ describe("", () => {
         const variables = `
           {
             "email": "${user.email}",
-            "password": "${user.password}"
+            "password": "11111111"
           }
         `;
         const query = `

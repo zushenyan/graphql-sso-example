@@ -3,7 +3,7 @@
 exports[` request handler should throw 1`] = `
 Object {
   "message": "internal server error",
-  "status": 500,
+  "status": "500",
 }
 `;
 

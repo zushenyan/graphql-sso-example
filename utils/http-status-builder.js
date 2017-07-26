@@ -1,5 +1,5 @@
 const buildMessage = (status, message) => ({
-  status,
+  status: status.toString(),
   message
 });
 

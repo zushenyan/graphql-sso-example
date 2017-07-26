@@ -1,90 +1,90 @@
 <template>
   <div id="app">
-    <h1>hello {{ email }}</h1>
-    <div>
-      <h1>Result</h1>
-      <button v-on:click="getUsers">get users</button>
-      <button v-on:click="getCurrentUser">get current user</button>
-      <pre>{{ result }}</pre>
+    <h1 v-if="error">{{ error }}</h1>
+    <h1>Hello {{ currentUser.email || "Guest" }}</h1>
+    <div v-if="!currentUser.email">
+      <div>
+        <h2>Sign Up</h2>
+        <div>
+          <label for="sign-up-email">email</label>
+          <input type="text" name="sign-up-email" v-model="signUp.email">
+        </div>
+        <div>
+          <label for="sign-up-password">password</label>
+          <input type="password" name="sign-up-password" v-model="signUp.password">
+        </div>
+        <div>
+          <label for="sign-up-confirm-password">confirm password</label>
+          <input type="password" name="sign-up-confirm-password" v-model="signUp.confirmPassword">
+        </div>
+        <button v-on:click="signUpMethod">sign up</button>
+      </div>
+      <div>
+        <h2>Sign In</h2>
+        <div>
+          <label for="sign-in-email">email</label>
+          <input type="text" name="sign-in-email" v-model="signIn.email">
+        </div>
+        <div>
+          <label for="sign-in-password">password</label>
+          <input type="password" name="sign-in-password" v-model="signIn.password">
+        </div>
+        <div><button v-on:click="signInMethod">sign in</button></div>
+        <div><button v-on:click="">sign in with facebook</button></div>
+        <div><button v-on:click="">sign in with google</button></div>
+      </div>
     </div>
-    <div>
-      <h1>Sign Up</h1>
-      <br>
-      <label for="email">email</label>
-      <input type="text" name="email" v-model="signUpEmail" />
-      <br>
-      <label for="password">password</label>
-      <input type="password" name="password" v-model="signUpPassword" />
-      <br>
-      <label for="confirm-password">password</label>
-      <input type="password" name="confirm-password" v-model="signUpConfirmPassword" />
-      <br>
-      <button v-on:click="signUp">sign up</button>
+    <div v-if="currentUser.email">
+      <div>
+        <h2>Update Profile</h2>
+        <div>
+          <label for="update-email">email</label>
+          <input type="text" name="update-email" v-model="updateProfile.email">
+        </div>
+        <div>
+          <label for="update-about">about</label>
+          <textarea name="update-about" rows="8" cols="80" v-model="updateProfile.about" />
+        </div>
+        <button v-on:click="updateProfileMethod">update profile</button>
+      </div>
+      <div>
+        <h2>Update Password</h2>
+        <div>
+          <label for="update-password">password</label>
+          <input type="password" name="update-password" v-model="updateProfile.password">
+        </div>
+        <div>
+          <label for="update-confirm-password">confirm password</label>
+          <input type="password" name="update-confirm-password" v-model="updateProfile.confirmPassword">
+        </div>
+        <button v-on:click="updatePasswordMethod">update password</button>
+      </div>
+      <div>
+        <h2>Sign Out</h2>
+        <button v-on:click="signOutMethod">sign out</button>
+      </div>
     </div>
-    <div>
-      <h1>Sign In</h1>
+    <div v-for="user in users" class="user">
       <br>
-      <label for="email">email</label>
-      <input type="text" name="email" v-model="signInEmail" />
-      <br>
-      <label for="password">password</label>
-      <input type="password" name="password" v-model="signInPassword" />
-      <br>
-      <button v-on:click="signIn">sign in</button>
-      <br>
-      <button v-on:click="signInWithFacebook">sign in with facebook</button>
-      <br>
-      <button v-on:click="signInWithGoogle">sign in with google</button>
-    </div>
-    <div>
-      <h1>Sign Out</h1>
-      <br>
-      <button v-on:click="signOut">sign out</button>
-    </div>
-    <div>
-      <h1>Set Message</h1>
-      <label for="message">message</label>
-      <input type="text" name="message" v-model="message">
-      <br>
-      <button v-on:click="setMessage">set message</button>
-    </div>
-    <div>
-      <h1>Set Email</h1>
-      <label for="new-email">email</label>
-      <input type="text" name="new-email" v-model="newEmail">
-      <br>
-      <button v-on:click="setEmail">set email</button>
+      <h2>{{ user.email }}</h2>
+      <h6>created at: {{ user.created_at }}</h6>
+      <h6>updated at: {{ user.updated_at }}</h6>
+      <q>{{ user.about }}</q>
     </div>
   </div>
 </template>
 
 <script>
-const fetchQL = (query, variables) => {
-  const headers = new Headers();
-  headers.append("Content-Type", "application/json");
-  headers.append("Accept", "application/json");
-  const init = {
-    method: "POST",
-    headers,
-    credentials: "include",
-    body: JSON.stringify({ query, variables }),
-  };
-  return fetch("/graphql", init)
-    .then((res) => res.json())
-    .then((res) => res.errors ? Promise.reject(res) : res);
-};
-
-let data = {
-  email:                 "guest",
-  signInEmail:           "foobar@test.com",
-  signInPassword:        "1234",
-  signUpEmail:           "meow@test.com",
-  signUpPassword:        "1111",
-  signUpConfirmPassword: "1111",
-  message:               "foobar lala",
-  newEmail:              "poop@test.com",
-  result:                ""
-};
+import {
+  getAllUsers,
+  getCurrentUser,
+  signIn,
+  signInWithFacebook,
+  signInWithGoogle,
+  signUp,
+  updateUser,
+  signOut
+} from "@/utils/api";
 
 export default {
   name: 'app',
@@ -94,213 +94,176 @@ export default {
     });
     document.addEventListener("googleInit", () => {
       console.log(`Google SDK is now available`);
-    })
+    });
+    this.getAllUsersMethod();
+    this.getCurrentUserMethod();
   },
-  data() { return data; },
+  data() {
+    return {
+      error:       "",
+      currentUser: {},
+      users:       [],
+      signUp: {
+        email:           "",
+        password:        "",
+        confirmPassword: ""
+      },
+      signIn: {
+        email:    "",
+        password: ""
+      },
+      updateProfile: {
+        email: "",
+        about: ""
+      }
+    };
+  },
   methods: {
-    getUsers(){
-      const query = `
-        {
-          getUsers{
-            id
-            email
-            message
-            token
-            facebookId
-            googleId
-          }
-        }
-      `;
-      fetchQL(query)
+    checkErrorMethod(data){
+      this.error = data.status[0] === "4" ? data.message : null;
+    },
+    updateCurrentUser(data){
+      this.currentUser = data;
+      this.updateProfile.email = this.currentUser.email || "";
+      this.updateProfile.about = this.currentUser.about || "";
+    },
+
+    getAllUsersMethod(){
+      return getAllUsers()
         .then((data) => {
-          this.result = data;
+          this.checkErrorMethod(data);
+          this.users = data.users.sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at));
         })
         .catch((err) => {
-          this.result = err;
+          this.error = err;
         });
     },
-    getCurrentUser(){
-      const query = `
-        {
-          getCurrentUser {
-            id
-            email
-            message
-            token
-            facebookId
-            googleId
-          }
-        }
-      `;
-      fetchQL(query)
+    getCurrentUserMethod(){
+      return getCurrentUser()
         .then((data) => {
-          this.result = data;
+          this.updateCurrentUser(data);
         })
         .catch((err) => {
-          this.result = err;
-        })
-    },
-    signInWithGoogle(){
-      gapi.auth2.getAuthInstance()
-        .signIn()
-        .then((user) => {
-          const { id_token: token } = user.getAuthResponse();
-          const query = `
-            mutation jjj($token: String!){
-              signInWithGoogle(token: $token){
-                id
-                email
-                message
-                token
-                facebookId
-                googleId
-              }
-            }
-          `;
-          fetchQL(query, { token })
-            .then((data) => {
-              this.email = data.data.signInWithGoogle.email;
-              this.result = data;
-            })
-            .catch((data) => {
-              this.result = data;
-            });
+          this.error = err;
         });
     },
-    signInWithFacebook(){
-      FB.login((res) => {
-        const {
-          authResponse: {
-            userID: userId,
-            accessToken
-          }
-        } = res;
-        const query = `
-          mutation kkk($userId: String!, $accessToken: String!){
-            signInWithFacebook(userId: $userId, accessToken: $accessToken){
-              id
-              email
-              message
-              token
-              facebookId
-              googleId
-            }
-          }
-        `;
-        fetchQL(query, { userId, accessToken })
-          .then((data) => {
-            this.email  = data.data.signInWithFacebook.email;
-            this.result = data;
-          })
-          .catch((err) => {
-            this.result = err;
-          })
-      });
-    },
-    signUp(){
-      const query = `
-        mutation qqq($email: String!, $password: String!, $confirmPassword: String!){
-          signUp(email: $email, password: $password, confirmPassword: $confirmPassword){
-            id
-            email
-            message
-            token
-            facebookId
-            googleId
-          }
-        }
-      `;
-      const { signUpEmail: email, signUpPassword: password, signUpConfirmPassword: confirmPassword } = this;
-      fetchQL(query, { email, password, confirmPassword })
+    signInMethod(){
+      const { email, password } = this.signIn;
+      return signIn(email, password)
         .then((data) => {
-          this.email = data.data.signUp.email;
-          this.result = data;
-        })
-        .catch((data) => {
-          this.result = data;
-        });
-    },
-    signIn(){
-      const query = `
-        mutation blah($email: String!, $password: String!){
-          signIn(email: $email, password: $password){
-            id
-            email
-            message
-            token
-            facebookId
-            googleId
-          }
-        }
-      `;
-      const { signInEmail: email, signInPassword: password } = this;
-      fetchQL(query, { email, password })
-        .then((data) => {
-          this.email = data.data.signIn.email;
-          this.result = data;
-        })
-        .catch((data) => {
-          this.result = data;
-        });
-    },
-    signOut(){
-      const query = `
-        mutation {
-          signOut
-        }
-      `;
-      fetchQL(query)
-        .then((data) => {
-          this.email = "guest";
-          this.result = data;
-        })
-        .catch((data) => {
-          this.result = data;
-        });
-    },
-    setMessage(){
-      const query = `
-        mutation weee($message: String!){
-          setMessage(message: $message){
-            id
-            email
-            message
-            token
-            facebookId
-            googleId
-          }
-        }
-      `;
-      fetchQL(query, { message: this.message })
-        .then((data) => {
-          this.result = data;
-        })
-        .catch((data) => {
-          this.result = data;
-        });
-    },
-    setEmail(){
-      const query = `
-        mutation kkkkkk($newEmail: String!){
-          setEmail(newEmail: $newEmail){
-            id
-            email
-            message
-            token
-            facebookId
-            googleId
-          }
-        }
-      `;
-      fetchQL(query, { newEmail: this.newEmail })
-        .then((data) => {
-          this.email = data.data.setEmail.email;
-          this.result = data;
+          this.checkErrorMethod(data);
+          this.updateCurrentUser(data);
         })
         .catch((err) => {
-          this.result = err;
+          this.error = err;
+        });
+    },
+    signOutMethod(){
+      return signOut()
+        .then((data) => {
+          this.checkErrorMethod(data);
+          this.updateCurrentUser({});
+        })
+        .catch((err) => {
+          this.error = err;
+        });
+    },
+    signUpMethod(){
+      const { email, password, confirmPassword } = this.signUp;
+      return signUp(email, password, confirmPassword)
+        .then((data) => {
+          this.checkErrorMethod(data);
+          this.updateCurrentUser(data);
+        })
+        .catch((err) => {
+          this.error = err;
+        })
+        .then(this.getAllUsersMethod);
+    },
+    updateProfileMethod(){
+      const { email, about } = this.updateProfile;
+      return updateUser({ email, about })
+        .then((data) => {
+          this.checkErrorMethod(data);
+          this.updateCurrentUser(data);
+        })
+        .catch((err) => {
+          this.error = err;
+        })
+        .then(this.getAllUsersMethod);
+    },
+    updatePasswordMethod(){
+      const { password, confirmPassword } = this.updateProfile;
+      if(password.trim() !== confirmPassword.trim()){
+        this.error = "passwords not match!";
+        return;
+      }
+      return updateUser({ password })
+        .then((data) => {
+          this.checkErrorMethod(data);
+          this.updateCurrentUser(data.status === "200" ? data : this.currentUser);
+        })
+        .catch((err) => {
+          this.error = err;
         });
     }
+    // signInWithGoogle(){
+    //   gapi.auth2.getAuthInstance()
+    //     .signInMethod()
+    //     .then((user) => {
+    //       const { id_token: token } = user.getAuthResponse();
+    //       const query = `
+    //         mutation jjj($token: String!){
+    //           signInWithGoogle(token: $token){
+    //             id
+    //             email
+    //             message
+    //             token
+    //             facebookId
+    //             googleId
+    //           }
+    //         }
+    //       `;
+    //       fetchQL(query, { token })
+    //         .then((data) => {
+    //           this.email = data.data.signInWithGoogle.email;
+    //           this.result = data;
+    //         })
+    //         .catch((data) => {
+    //           this.result = data;
+    //         });
+    //     });
+    // },
+    // signInWithFacebook(){
+    //   FB.login((res) => {
+    //     const {
+    //       authResponse: {
+    //         userID: userId,
+    //         accessToken
+    //       }
+    //     } = res;
+    //     const query = `
+    //       mutation kkk($userId: String!, $accessToken: String!){
+    //         signInWithFacebook(userId: $userId, accessToken: $accessToken){
+    //           id
+    //           email
+    //           message
+    //           token
+    //           facebookId
+    //           googleId
+    //         }
+    //       }
+    //     `;
+    //     fetchQL(query, { userId, accessToken })
+    //       .then((data) => {
+    //         this.email  = data.data.signInWithFacebook.email;
+    //         this.result = data;
+    //       })
+    //       .catch((err) => {
+    //         this.result = err;
+    //       })
+    //   });
+    // },
   }
 }
 </script>
@@ -317,5 +280,14 @@ export default {
 
 pre {
   text-align: left;
+}
+
+br {
+  content: " ";
+  display: block;
+  width: 50%;
+  height: 1px;
+  margin: 10px auto 10px auto;
+  border-top: 1px solid black;
 }
 </style>

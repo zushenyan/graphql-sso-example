@@ -36,15 +36,14 @@ describe("controller/user.js", () => {
 
   describe("getAllUsers", () => {
     it("should get all users", async () => {
-      const result = await userController.getAllUsers();
-      expect(result.users).toBeDefined();
+      await expect(userController.getAllUsers()).resolves.toMatchObject({ status: "200" });
     });
   });
 
   describe("getCurrentUser", () => {
     it("should get current user successfully", async () => {
       const jwt    = createJWT(1);
-      await expect(userController.getCurrentUser({ jwt })).toBeDefined();
+      await expect(userController.getCurrentUser({ jwt })).resolves.toMatchObject({ status: "200" });
     });
 
     it("should throw error when token is invalid", async () => {
@@ -90,7 +89,7 @@ describe("controller/user.js", () => {
         password:        "12345678",
         confirmPassword: "12345678"
       };
-      await expect(userController.signUp(data)).resolves.toBeDefined();
+      await expect(userController.signUp(data)).resolves.toMatchObject({ status: "200" });
     });
 
     it("should fail when password doesn't match with confirmation password", async () => {
@@ -124,9 +123,9 @@ describe("controller/user.js", () => {
       const user  = await knex("users").where({ id: 1 }).first();
       const data  = {
         email:    user.email,
-        password: user.password
+        password: "11111111"
       };
-      await expect(userController.signIn(data)).resolves.toBeDefined();
+      await expect(userController.signIn(data)).resolves.toMatchObject({ status: "200" });
     });
 
     it("should not let user sign in when input wrong credential", async () => {
@@ -196,7 +195,7 @@ describe("controller/user.js", () => {
 
   describe("signOut", () => {
     it("should work", () => {
-      expect(userController.signOut()).toMatchSnapshot();
+      expect(userController.signOut()).toMatchObject({ status: "200" });
     });
   });
 });

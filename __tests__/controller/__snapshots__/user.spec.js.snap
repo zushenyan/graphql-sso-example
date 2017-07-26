@@ -15,28 +15,28 @@ Object {
 exports[`controller/user.js getCurrentUser should response 404 when id is not found 1`] = `
 Object {
   "message": "user 6 not found",
-  "status": 400,
+  "status": "400",
 }
 `;
 
 exports[`controller/user.js getCurrentUser should throw error when token is invalid 1`] = `
 Object {
   "message": "invalid token",
-  "status": 400,
+  "status": "400",
 }
 `;
 
 exports[`controller/user.js signIn should not let user sign in when input wrong credential 1`] = `
 Object {
   "message": "invalid email or password",
-  "status": 401,
+  "status": "401",
 }
 `;
 
 exports[`controller/user.js signIn should not let user sign in when input wrong credential 2`] = `
 Object {
   "message": "invalid email or password",
-  "status": 401,
+  "status": "401",
 }
 `;
 
@@ -44,26 +44,19 @@ exports[`controller/user.js signOut should work 1`] = `[Error: Undefined binding
 
 exports[`controller/user.js signOut should work 2`] = `[error: select * from "users" where "no_such_column" = $1 limit $2 - column "no_such_column" does not exist]`;
 
-exports[`controller/user.js signOut should work 3`] = `
-Object {
-  "message": "ok",
-  "status": 200,
-}
-`;
-
 exports[`controller/user.js signUp should fail when email already exists 1`] = `[error: insert into "users" ("email", "password") values ($1, $2) returning * - duplicate key value violates unique constraint "users_email_unique"]`;
 
 exports[`controller/user.js signUp should fail when password doesn't match with confirmation password 1`] = `
 Object {
   "message": "passwords don't match!",
-  "status": 400,
+  "status": "400",
 }
 `;
 
 exports[`controller/user.js signUp should fail when password doesn't match with confirmation password 2`] = `
 Object {
   "message": "password should be at least 8 characters",
-  "status": 400,
+  "status": "400",
 }
 `;
 
