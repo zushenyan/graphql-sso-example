@@ -1,6 +1,11 @@
 <template>
   <div id="app">
-    <h1 v-if="error">{{ error }}</h1>
+    <transition name="fade">
+      <h1 v-if="showError" class="error">{{ error }}</h1>
+    </transition>
+    <transition name="fade">
+      <h1 v-if="showMessage" class="message">{{ message }}</h1>
+    </transition>
     <h1>Hello {{ currentUser.email || "Guest" }}</h1>
     <div v-if="!currentUser.email">
       <div>
@@ -30,8 +35,8 @@
           <input type="password" name="sign-in-password" v-model="signIn.password">
         </div>
         <div><button v-on:click="signInMethod">sign in</button></div>
-        <div><button v-on:click="">sign in with facebook</button></div>
-        <div><button v-on:click="">sign in with google</button></div>
+        <div><button v-on:click="signInWithFacebookMethod">sign in with facebook</button></div>
+        <div><button v-on:click="signInWithGoogleMethod">sign in with google</button></div>
       </div>
     </div>
     <div v-if="currentUser.email">
@@ -100,10 +105,13 @@ export default {
   },
   data() {
     return {
+      message:     "",
+      showMessage: false,
       error:       "",
+      showError:   false,
       currentUser: {},
       users:       [],
-      signUp: {
+      signUp:      {
         email:           "",
         password:        "",
         confirmPassword: ""
@@ -121,10 +129,23 @@ export default {
     };
   },
   methods: {
-    checkErrorMethod(data){
-      this.error = data.status[0] === "4" ? data.message : null;
+    setMessageMethod(message, data){
+      const shouldShowMessage = data.status[0] === "2";
+      if(shouldShowMessage){
+        this.showMessage = true;
+        this.message     = this.showMessage ? message : this.message;
+        setTimeout(() => this.showMessage = false, 2000);
+      }
     },
-    updateCurrentUser(data){
+    checkErrorMethod(data){
+      const shouldShowError = data.status[0] === "4" || data.status[0] === "5";
+      if(shouldShowError){
+        this.showError = true;
+        this.error     = this.showError ? data.message : this.error;
+        setTimeout(() => this.showError = false, 2000);
+      }
+    },
+    updateCurrentUserMethod(data){
       this.currentUser = data;
       const {
         email = "",
@@ -148,7 +169,7 @@ export default {
     getCurrentUserMethod(){
       return getCurrentUser()
         .then((data) => {
-          this.updateCurrentUser(data);
+          this.updateCurrentUserMethod(data);
         })
         .catch((err) => {
           this.error = err;
@@ -159,7 +180,8 @@ export default {
       return signIn(email, password)
         .then((data) => {
           this.checkErrorMethod(data);
-          this.updateCurrentUser(data);
+          this.updateCurrentUserMethod(data);
+          this.setMessageMethod("sign in successfully!", data);
         })
         .catch((err) => {
           this.error = err;
@@ -169,7 +191,8 @@ export default {
       return signOut()
         .then((data) => {
           this.checkErrorMethod(data);
-          this.updateCurrentUser({});
+          this.updateCurrentUserMethod({});
+          this.setMessageMethod("sign out successfully!", data);
         })
         .catch((err) => {
           this.error = err;
@@ -180,7 +203,8 @@ export default {
       return signUp(email, password, confirmPassword)
         .then((data) => {
           this.checkErrorMethod(data);
-          this.updateCurrentUser(data);
+          this.updateCurrentUserMethod(data);
+          this.setMessageMethod("sign up successfully!", data);
         })
         .catch((err) => {
           this.error = err;
@@ -192,7 +216,8 @@ export default {
       return updateUser({ email, about })
         .then((data) => {
           this.checkErrorMethod(data);
-          this.updateCurrentUser(data);
+          this.updateCurrentUserMethod(data);
+          this.setMessageMethod("update profile successfully!", data);
         })
         .catch((err) => {
           this.error = err;
@@ -208,69 +233,51 @@ export default {
       return updateUser({ password })
         .then((data) => {
           this.checkErrorMethod(data);
-          this.updateCurrentUser(data.status === "200" ? data : this.currentUser);
+          this.updateCurrentUserMethod(data.status === "200" ? data : this.currentUser);
+          this.setMessageMethod("update password successfully!", data);
         })
         .catch((err) => {
           this.error = err;
         });
-    }
-    // signInWithGoogle(){
-    //   gapi.auth2.getAuthInstance()
-    //     .signInMethod()
-    //     .then((user) => {
-    //       const { id_token: token } = user.getAuthResponse();
-    //       const query = `
-    //         mutation jjj($token: String!){
-    //           signInWithGoogle(token: $token){
-    //             id
-    //             email
-    //             message
-    //             token
-    //             facebookId
-    //             googleId
-    //           }
-    //         }
-    //       `;
-    //       fetchQL(query, { token })
-    //         .then((data) => {
-    //           this.email = data.data.signInWithGoogle.email;
-    //           this.result = data;
-    //         })
-    //         .catch((data) => {
-    //           this.result = data;
-    //         });
-    //     });
-    // },
-    // signInWithFacebook(){
-    //   FB.login((res) => {
-    //     const {
-    //       authResponse: {
-    //         userID: userId,
-    //         accessToken
-    //       }
-    //     } = res;
-    //     const query = `
-    //       mutation kkk($userId: String!, $accessToken: String!){
-    //         signInWithFacebook(userId: $userId, accessToken: $accessToken){
-    //           id
-    //           email
-    //           message
-    //           token
-    //           facebookId
-    //           googleId
-    //         }
-    //       }
-    //     `;
-    //     fetchQL(query, { userId, accessToken })
-    //       .then((data) => {
-    //         this.email  = data.data.signInWithFacebook.email;
-    //         this.result = data;
-    //       })
-    //       .catch((err) => {
-    //         this.result = err;
-    //       })
-    //   });
-    // },
+    },
+    signInWithGoogleMethod(){
+      gapi.auth2
+        .getAuthInstance()
+        .signIn()
+        .then((user) => {
+          const { id_token: token } = user.getAuthResponse();
+          signInWithGoogle(token)
+            .then((data) => {
+              this.checkErrorMethod(data);
+              this.updateCurrentUserMethod(data);
+              this.setMessageMethod("sign in successfully!", data);
+            })
+            .catch((err) => {
+              this.error = err;
+            })
+            .then(this.getAllUsersMethod);
+        });
+    },
+    signInWithFacebookMethod(){
+      FB.login((res) => {
+        const {
+          authResponse: {
+            userID: userId,
+            accessToken
+          }
+        } = res;
+        signInWithFacebook(userId, accessToken)
+          .then((data) => {
+            this.checkErrorMethod(data);
+            this.updateCurrentUserMethod(data);
+            this.setMessageMethod("sign in successfully!", data);
+          })
+          .catch((err) => {
+            this.error = err;
+          })
+          .then(this.getAllUsersMethod);
+      });
+    },
   }
 }
 </script>
@@ -296,5 +303,25 @@ br {
   height: 1px;
   margin: 10px auto 10px auto;
   border-top: 1px solid black;
+}
+
+.error {
+  background-color: red;
+  color: white;
+}
+
+.message {
+  background-color: lightgreen;
+  color: white;
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity .5s;
+}
+
+.fade-enter,
+.fade-leave-to {
+  opacity: 0;
 }
 </style>

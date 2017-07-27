@@ -4,13 +4,32 @@
     <title>test</title>
     <meta name="google-signin-client_id" content="251705430658-8srvl2c4lisschflk5pmd4tggmjcfkkp.apps.googleusercontent.com">
     <script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
-    <script src="https://apis.google.com/js/platform.js" async defer></script>
+    <script src="https://apis.google.com/js/platform.js"></script>
   </head>
   <body>
     <h1>google</h1>
 
     <div class="g-signin2" data-onsuccess="onSignIn"></div>
     <script>
+    // gapi.load("auth2", () => {
+    //   gapi.auth2.init({
+    //     client_id: "251705430658-8srvl2c4lisschflk5pmd4tggmjcfkkp.apps.googleusercontent.com"
+    //   })
+    //   .then(() => {
+    //     document.dispatchEvent(new Event("googleInit"));
+    //   });
+    // });
+    // document.addEventListener("googleInit", () => {
+    //   gapi.auth2
+    //   .getAuthInstance()
+    //   .signIn()
+    //   .then(user => {
+    //     console.log(user);
+    //   })
+    //   .catch(err => {
+    //     console.error(err);
+    //   });
+    // });
       function onSignIn(user){
         console.log(user);
         console.log(user.getAuthResponse());

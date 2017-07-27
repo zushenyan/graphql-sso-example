@@ -49,7 +49,7 @@ const updateUser = async ({ jwt, data }) => {
   if(data.id)         delete data.id;
   if(data.created_at) delete data.created_at;
   if(data.updated_at) delete data.updated_at;
-  if(data.password) {
+  if(data.password !== undefined && data.password !== null) {
     if(!validatePassword(data.password)) return buildMessage(400, `password should be at least 8 characters`)
     data.password = await genHash(data.password)
   };
@@ -87,7 +87,7 @@ const signIn = async ({ email, password }) => {
 };
 
 const signInWithSSO = async (vendorVerification, idColumnName) => {
-  const { id, email } = vendorVerification();
+  const { id, email } = await vendorVerification();
   const existUser     = await userModel.find({ [idColumnName]: id }).first() || await userModel.find({ email }).first();
   const updatedUser   = (
     existUser ?

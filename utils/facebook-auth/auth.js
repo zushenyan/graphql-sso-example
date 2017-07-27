@@ -17,6 +17,6 @@ module.exports = (userId, accessToken) => new Promise((res, rej) => {
       fields:       "id,email"
     }
   })
-  .then((data) => res(responseFormatter(data)))
+  .then((data) => res(responseFormatter(data.data)))
   .catch((err) => rej(errorFormatter(rer)));
 });

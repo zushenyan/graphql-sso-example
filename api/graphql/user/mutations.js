@@ -59,7 +59,7 @@ module.exports.signInWithFacebook = {
   resolve: async (root, args, context) =>
     await graphqlRequestHandler(async () => {
       const { userId, accessToken } = args;
-      const result = await controller.signInWithFacebook(
+      const result = await controller.signInWithSSO(
         () => facebookAuthVerify(userId, accessToken),
         "facebook_id"
       );
@@ -78,7 +78,7 @@ module.exports.signInWithGoogle = {
   resolve: async (root, args, context) =>
     await graphqlRequestHandler(async () => {
       const { token } = args;
-      const result = await controller.signInWithGoogle(
+      const result = await controller.signInWithSSO(
         () => googleAuthVerify(token),
         "google_id"
       );
