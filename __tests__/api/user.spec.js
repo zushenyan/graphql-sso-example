@@ -1,10 +1,16 @@
+jest.mock("utils/facebook-auth/auth.js");
+jest.mock("utils/google-auth/auth.js");
+
 const app           = require("app.js");
 const supertest     = require("supertest");
 const knex          = require("db/knex.js");
 const cookieKeys    = require("config/cookie-keys.js");
 const routes        = require("config/routes.js");
 const { createJWT } = require("utils/jwt.js");
+const facebookAuth  = require("utils/facebook-auth/auth.js");
+const googleAuth    = require("utils/google-auth/auth.js");
 const util          = require("util");
+
 
 const logObject = (obj) => {
   console.log(util.inspect(obj, {
@@ -168,14 +174,71 @@ describe("", () => {
     });
 
     describe("signInWithFacebook", () => {
-      it("should set cookie when sign in successfully", () => {
-        console.log("can\'t test because sso testing account is not deterministic");
+      it("should set cookie when sign in successfully", async () => {
+        const fakeUser = await facebookAuth();
+        const variables = `
+          {
+            "userId": "I dont care",
+            "accessToken": "whatever"
+          }
+        `;
+        const query = `
+          mutation signInWithFacebook($userId: String!, $accessToken: String!){
+            signInWithFacebook(userId: $userId, accessToken: $accessToken){
+              ...UserType
+            }
+          }
+          ${fragmentUserType}
+        `;
+        return request
+          .send(JSON.stringify({ query, variables }))
+          .expect((res) => {
+            if(res.body.errors) logObject(res.body);
+            else {
+              const result = res.body.data.signInWithFacebook;
+              expect(result.status).toEqual("200");
+              expect(result).toMatchObject({
+                facebook_id: fakeUser.id,
+                email:       fakeUser.email
+              });
+              expect(res.header["set-cookie"].length).toBeGreaterThan(0);
+            }
+          })
+          .expect(200);
       });
     });
 
     describe("signInWithGoogle", () => {
-      it("should set cookie when sign in successfully", () => {
-        console.log("can\'t test because sso testing account is not deterministic");
+      it("should set cookie when sign in successfully", async () => {
+        const fakeUser = await googleAuth();
+        const variables = `
+          {
+            "token": "I dont care"
+          }
+        `;
+        const query = `
+          mutation signInWithGoogle($token: String!){
+            signInWithGoogle(token: $token){
+              ...UserType
+            }
+          }
+          ${fragmentUserType}
+        `;
+        return request
+          .send(JSON.stringify({ query, variables }))
+          .expect((res) => {
+            if(res.body.errors) logObject(res.body);
+            else {
+              const result = res.body.data.signInWithGoogle;
+              expect(result.status).toEqual("200");
+              expect(result).toMatchObject({
+                google_id: fakeUser.id,
+                email:     fakeUser.email
+              });
+              expect(res.header["set-cookie"].length).toBeGreaterThan(0);
+            }
+          })
+          .expect(200);
       });
     });
 

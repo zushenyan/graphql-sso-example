@@ -11,25 +11,6 @@
 
     <div class="g-signin2" data-onsuccess="onSignIn"></div>
     <script>
-    // gapi.load("auth2", () => {
-    //   gapi.auth2.init({
-    //     client_id: "251705430658-8srvl2c4lisschflk5pmd4tggmjcfkkp.apps.googleusercontent.com"
-    //   })
-    //   .then(() => {
-    //     document.dispatchEvent(new Event("googleInit"));
-    //   });
-    // });
-    // document.addEventListener("googleInit", () => {
-    //   gapi.auth2
-    //   .getAuthInstance()
-    //   .signIn()
-    //   .then(user => {
-    //     console.log(user);
-    //   })
-    //   .catch(err => {
-    //     console.error(err);
-    //   });
-    // });
       function onSignIn(user){
         console.log(user);
         console.log(user.getAuthResponse());

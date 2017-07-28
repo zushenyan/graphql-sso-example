@@ -10,18 +10,16 @@ const logger       = require("utils/logger.js");
 
 const sitePage =
   express()
-    .get("/facebook", (req, res) => {
-      res.sendFile(path.resolve(__dirname, "./public/facebook.html"));
-    })
-    .get("/google", (req, res) => {
-      res.sendFile(path.resolve(__dirname, "./public/google.html"));
+    .use(express.static(path.resolve(__dirname, "./public/spa")))
+    .get("/", (req, res) => {
+      res.sendFile(path.resolve(__dirname, "./public/spa/index.html"));
     });
 
 const graphqlAPI =
   express()
     .use("/graphql", graphqlHTTP((req, res) => ({
       schema,
-      graphiql: true,
+      graphiql: process.env.NODE_ENV !== "production",
       context: { req, res }
     })));
 
