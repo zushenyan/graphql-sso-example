@@ -31,7 +31,7 @@
     "supertest": "^3.0.0"
   },
   "scripts": {
-    "start": "NODE_ENV=production NODE_PATH=. pm2 start boot.js",
+    "start": "NODE_ENV=production NODE_PATH=. node boot.js",
     "dev": "NODE_ENV=development NODE_PATH=. nodemon boot.js",
     "test": "NODE_ENV=test NODE_PATH=. jest --watch",
     "nodemon": "NODE_PATH=. nodemon",
