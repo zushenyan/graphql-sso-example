@@ -1,5 +1,5 @@
 // Update with your config settings.
-
+// 
 module.exports = {
   test: {
     client: 'pg',
@@ -38,7 +38,7 @@ module.exports = {
   production: {
     client: 'pg',
     connection: {
-      database: 'graphqlsso_production'
+      database: process.env.DATABASE_URL
     },
     migrations: {
       directory: './db/migrations'
