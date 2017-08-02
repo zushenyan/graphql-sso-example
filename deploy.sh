@@ -1,7 +1,4 @@
-false &&
 echo "Deployment start...."
-
-
 
 # build client
 rm -rf ./public/spa/static && \

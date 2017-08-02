@@ -1,5 +1,5 @@
 // Update with your config settings.
-// 
+//
 module.exports = {
   test: {
     client: 'pg',
@@ -38,7 +38,8 @@ module.exports = {
   production: {
     client: 'pg',
     connection: {
-      database: process.env.DATABASE_URL
+      database: process.env.DATABASE_URL,
+      ssl: true
     },
     migrations: {
       directory: './db/migrations'
