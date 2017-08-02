@@ -1,7 +1,6 @@
 const path         = require("path");
 const express      = require("express");
 const morgan       = require("morgan");
-const cors         = require("cors");
 const helmet       = require("helmet");
 const cookieParser = require("cookie-parser");
 const graphqlHTTP  = require("express-graphql");
@@ -25,7 +24,6 @@ const graphqlAPI =
 
 module.exports =
   express()
-    .use(cors())
     .use(helmet())
     .use(morgan("dev", { stream: logger.consoleStream }))
     .use(morgan("common", { stream: logger.fileStream }))
