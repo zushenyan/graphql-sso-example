@@ -6,6 +6,7 @@ rm -rf ./public/spa/index.html && \
 cd ./client && \
 yarn install && \
 yarn run build && \
+ls dist && \
 cd .. && \
 cp -r ./client/dist/* ./public/spa && \
 
