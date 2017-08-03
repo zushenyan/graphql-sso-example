@@ -6,9 +6,8 @@ rm -rf ./public/spa/index.html && \
 cd ./client && \
 yarn install && \
 yarn run build && \
-ls dist && \
 cd .. && \
-cp -r ./client/dist/* ./public/spa && \
+cp -vr ./client/dist/* ./public/spa && \
 
 # database mirgration
 NODE_ENV=production yarn run knex migrate:latest
