@@ -2,7 +2,7 @@ echo "Deployment start...."
 
 # build client
 rm -rf ./public/spa/static && \
-rm ./public/spa/index.html && \
+rm -rf ./public/spa/index.html && \
 cd ./client && \
 yarn install && \
 yarn run build && \
