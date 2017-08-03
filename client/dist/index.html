@@ -1,0 +1,24 @@
+<!DOCTYPE html><html><head><meta charset=utf-8><title>client</title><link href=/static/css/app.27f0c5e3bfff8c3dd485f60c1d5d7b0d.css rel=stylesheet></head><body><script src=https://apis.google.com/js/platform.js></script><script>window.fbAsyncInit = function() {
+        FB.init({
+          appId      : '131009120793785',
+          cookie: true,
+          xfbml      : true,
+          version    : 'v2.9'
+        });
+        document.dispatchEvent(new Event("fbInit"));
+      };
+
+      (function(d, s, id){
+         var js, fjs = d.getElementsByTagName(s)[0];
+         if (d.getElementById(id)) {return;}
+         js = d.createElement(s); js.id = id;
+         js.src = "//connect.facebook.net/en_US/sdk.js";
+         fjs.parentNode.insertBefore(js, fjs);
+      }(document, 'script', 'facebook-jssdk'));</script><script>gapi.load("auth2", () => {
+        gapi.auth2.init({
+          client_id: "251705430658-8srvl2c4lisschflk5pmd4tggmjcfkkp.apps.googleusercontent.com"
+        })
+        .then(() => {
+          document.dispatchEvent(new Event("googleInit"));
+        });
+      });</script><div id=app></div><script type=text/javascript src=/static/js/manifest.6c5b77ed86674b4663f3.js></script><script type=text/javascript src=/static/js/vendor.119fe08845b70398f745.js></script><script type=text/javascript src=/static/js/app.83136605080ba225dd60.js></script></body></html>
