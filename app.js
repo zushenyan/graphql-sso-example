@@ -9,9 +9,9 @@ const logger       = require("utils/logger.js");
 
 const sitePage =
   express()
-    .use(express.static(path.resolve("./public/spa")))
+    .use(express.static("./public/spa"))
     .get("/", (req, res) => {
-      res.sendFile(path.resolve("./public/spa/index.html"));
+      res.sendFile("./public/spa/index.html");
     });
 
 const graphqlAPI =
