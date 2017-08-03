@@ -11,5 +11,3 @@ cp -r ./client/dist/* ./public/spa
 
 # databasemirgration
 NODE_ENV=production yarn run knex migrate:latest
-
-echo "Deployment done!"
