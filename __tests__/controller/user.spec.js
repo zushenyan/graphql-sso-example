@@ -114,7 +114,7 @@ describe("controller/user.js", () => {
         password:        "12345678",
         confirmPassword: "12345678"
       };
-      await expect(userController.signUp(data)).rejects.toMatchSnapshot();
+      await expect(userController.signUp(data)).resolves.toMatchSnapshot();
     });
   });
 

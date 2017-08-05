@@ -44,7 +44,12 @@ exports[`controller/user.js signOut should work 1`] = `[Error: Undefined binding
 
 exports[`controller/user.js signOut should work 2`] = `[error: select * from "users" where "no_such_column" = $1 limit $2 - column "no_such_column" does not exist]`;
 
-exports[`controller/user.js signUp should fail when email already exists 1`] = `[error: insert into "users" ("email", "password") values ($1, $2) returning * - duplicate key value violates unique constraint "users_email_unique"]`;
+exports[`controller/user.js signUp should fail when email already exists 1`] = `
+Object {
+  "message": "Email has already been taken!",
+  "status": "400",
+}
+`;
 
 exports[`controller/user.js signUp should fail when password doesn't match with confirmation password 1`] = `
 Object {

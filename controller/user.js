@@ -65,6 +65,8 @@ const updateUser = async ({ jwt, data }) => {
 const signUp = async ({ email, password, confirmPassword }) => {
   if(password.trim() !== confirmPassword.trim()) return buildMessage(400, `passwords don't match!`);
   if(!validatePassword(password)) return buildMessage(400, `password should be at least 8 characters`);
+  const duplicateEmail = await userModel.find({ email }).first();
+  if(duplicateEmail) return buildMessage(400, `Email has already been taken!`);
   const hash = await genHash(password);
   const user = (await userModel.create({ email, password: hash }))[0];
   return Object.assign(
